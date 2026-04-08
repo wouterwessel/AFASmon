@@ -1,0 +1,263 @@
+{
+  "automatiseer": {
+    "name": "Automatiseer",
+    "type": "DOEN",
+    "power": 50,
+    "accuracy": 95,
+    "pp": 20,
+    "effect": null,
+    "description": "Automatiseer het probleem weg met pure daadkracht."
+  },
+  "invoice_impact": {
+    "name": "Invoice Impact",
+    "type": "DOEN",
+    "power": 65,
+    "accuracy": 90,
+    "pp": 15,
+    "effect": null,
+    "description": "Een verpletterende factuur raakt de tegenstander vol."
+  },
+  "belasting_blast": {
+    "name": "Belasting Blast",
+    "type": "DOEN",
+    "power": 80,
+    "accuracy": 80,
+    "pp": 10,
+    "effect": { "type": "debuff", "stat": "defense", "amount": -5, "chance": 0.3 },
+    "description": "Een explosieve belastingaanslag die de verdediging kan verlagen."
+  },
+  "winst_wave": {
+    "name": "Winst Wave",
+    "type": "DOEN",
+    "power": 40,
+    "accuracy": 100,
+    "pp": 25,
+    "effect": { "type": "buff", "stat": "attack", "amount": 5, "chance": 0.5 },
+    "description": "Een golf van winst die je aanvalskracht kan verhogen."
+  },
+  "loonstrook_launch": {
+    "name": "Loonstrook Launch",
+    "type": "FAMILIE",
+    "power": 55,
+    "accuracy": 95,
+    "pp": 20,
+    "effect": null,
+    "description": "Lanceert een stapel loonstroken naar de tegenstander."
+  },
+  "cao_shield": {
+    "name": "CAO Shield",
+    "type": "FAMILIE",
+    "power": 0,
+    "accuracy": 100,
+    "pp": 15,
+    "effect": { "type": "buff", "stat": "defense", "amount": 15, "chance": 1.0 },
+    "description": "Een beschermend schild van 200+ CAO's verhoogt je verdediging."
+  },
+  "familie_kracht": {
+    "name": "Familie Kracht",
+    "type": "FAMILIE",
+    "power": 70,
+    "accuracy": 85,
+    "pp": 12,
+    "effect": { "type": "heal", "amount": 15, "chance": 0.5 },
+    "description": "De kracht van familie geneest en raakt tegelijk."
+  },
+  "pensioen_power": {
+    "name": "Pensioen Power",
+    "type": "FAMILIE",
+    "power": 45,
+    "accuracy": 100,
+    "pp": 20,
+    "effect": { "type": "buff", "stat": "defense", "amount": 8, "chance": 0.7 },
+    "description": "Investeer in de toekomst om sterker te worden."
+  },
+  "klantrelatie": {
+    "name": "Klantrelatie",
+    "type": "VERTROUWEN",
+    "power": 0,
+    "accuracy": 100,
+    "pp": 15,
+    "effect": { "type": "heal", "amount": 30, "chance": 1.0 },
+    "description": "Versterk de band en herstel HP."
+  },
+  "data_shield": {
+    "name": "Data Shield",
+    "type": "VERTROUWEN",
+    "power": 0,
+    "accuracy": 100,
+    "pp": 10,
+    "effect": { "type": "buff", "stat": "defense", "amount": 20, "chance": 1.0 },
+    "description": "Datasoevereiniteit beschermt je met een onbreekbaar schild."
+  },
+  "crm_scan": {
+    "name": "CRM Scan",
+    "type": "VERTROUWEN",
+    "power": 55,
+    "accuracy": 95,
+    "pp": 18,
+    "effect": { "type": "debuff", "stat": "defense", "amount": -8, "chance": 0.4 },
+    "description": "Scan de tegenstander en onthul zwakke plekken."
+  },
+  "vertrouwen_veld": {
+    "name": "Vertrouwen Veld",
+    "type": "VERTROUWEN",
+    "power": 60,
+    "accuracy": 90,
+    "pp": 15,
+    "effect": null,
+    "description": "Een veld van vertrouwen dat de tegenstander overweldigt."
+  },
+  "supply_chain_strike": {
+    "name": "Supply Chain Strike",
+    "type": "DOEN",
+    "power": 70,
+    "accuracy": 90,
+    "pp": 15,
+    "effect": null,
+    "description": "Een perfecte supply chain levert een verpletterende klap."
+  },
+  "levering_lash": {
+    "name": "Levering Lash",
+    "type": "DOEN",
+    "power": 45,
+    "accuracy": 100,
+    "pp": 25,
+    "effect": null,
+    "description": "Snelle levering, snelle schade."
+  },
+  "voorraad_vortex": {
+    "name": "Voorraad Vortex",
+    "type": "DOEN",
+    "power": 85,
+    "accuracy": 75,
+    "pp": 8,
+    "effect": null,
+    "description": "Een draaikolk van voorraad overweldigt alles in zijn pad."
+  },
+  "standaardiseer": {
+    "name": "Standaardiseer",
+    "type": "GEK",
+    "power": 40,
+    "accuracy": 100,
+    "pp": 20,
+    "effect": { "type": "debuff", "stat": "speed", "amount": -10, "chance": 0.6 },
+    "description": "Dwing standaardisatie af en vertraag de tegenstander."
+  },
+  "process_chaos": {
+    "name": "Process Chaos",
+    "type": "GEK",
+    "power": 75,
+    "accuracy": 80,
+    "pp": 12,
+    "effect": { "type": "debuff", "stat": "attack", "amount": -8, "chance": 0.3 },
+    "description": "Zaai chaos in de processen van je tegenstander."
+  },
+  "workflow_warp": {
+    "name": "Workflow Warp",
+    "type": "GEK",
+    "power": 60,
+    "accuracy": 90,
+    "pp": 15,
+    "effect": { "type": "buff", "stat": "speed", "amount": 10, "chance": 0.5 },
+    "description": "Verbuig de workflow en verhoog je snelheid."
+  },
+  "gek_gambit": {
+    "name": "Gek Gambit",
+    "type": "GEK",
+    "power": 90,
+    "accuracy": 70,
+    "pp": 8,
+    "effect": { "type": "recoil", "amount": 15 },
+    "description": "Een gekke maar krachtige gok. Kost ook jezelf HP."
+  },
+  "voorcalculatie": {
+    "name": "Voorcalculatie",
+    "type": "VERTROUWEN",
+    "power": 50,
+    "accuracy": 100,
+    "pp": 20,
+    "effect": { "type": "buff", "stat": "defense", "amount": 10, "chance": 0.6 },
+    "description": "Bereken alles vooraf en bouw verdediging op."
+  },
+  "planning_pulse": {
+    "name": "Planning Pulse",
+    "type": "VERTROUWEN",
+    "power": 60,
+    "accuracy": 95,
+    "pp": 15,
+    "effect": null,
+    "description": "Een goed gepland offensief treft altijd doel."
+  },
+  "deadline_dodge": {
+    "name": "Deadline Dodge",
+    "type": "VERTROUWEN",
+    "power": 0,
+    "accuracy": 100,
+    "pp": 10,
+    "effect": { "type": "buff", "stat": "speed", "amount": 15, "chance": 1.0 },
+    "description": "Ontwijkt als een deadline die net niet gehaald wordt. Verhoogt snelheid."
+  },
+  "pocket_push": {
+    "name": "Pocket Push",
+    "type": "GEK",
+    "power": 45,
+    "accuracy": 100,
+    "pp": 25,
+    "effect": null,
+    "description": "Een snelle push-notificatie die altijd aankomt."
+  },
+  "notificatie_storm": {
+    "name": "Notificatie Storm",
+    "type": "GEK",
+    "power": 30,
+    "accuracy": 100,
+    "pp": 20,
+    "effect": { "type": "debuff", "stat": "speed", "amount": -5, "chance": 0.8 },
+    "description": "Overspoelt de tegenstander met notificaties."
+  },
+  "app_attack": {
+    "name": "App Attack",
+    "type": "GEK",
+    "power": 65,
+    "accuracy": 90,
+    "pp": 15,
+    "effect": null,
+    "description": "Een directe aanval vanuit de app."
+  },
+  "innovatie_blast": {
+    "name": "Innovatie Blast",
+    "type": "LEGENDARY",
+    "power": 100,
+    "accuracy": 85,
+    "pp": 5,
+    "effect": { "type": "debuff", "stat": "defense", "amount": -15, "chance": 0.5 },
+    "description": "De ultieme innovatie-aanval die alles verandert."
+  },
+  "ai_overload": {
+    "name": "AI Overload",
+    "type": "LEGENDARY",
+    "power": 85,
+    "accuracy": 90,
+    "pp": 8,
+    "effect": { "type": "debuff", "stat": "attack", "amount": -10, "chance": 0.4 },
+    "description": "Kunstmatige intelligentie overweldigt de tegenstander."
+  },
+  "cloud_migratie": {
+    "name": "Cloud Migratie",
+    "type": "LEGENDARY",
+    "power": 70,
+    "accuracy": 95,
+    "pp": 10,
+    "effect": { "type": "buff", "stat": "speed", "amount": 12, "chance": 0.6 },
+    "description": "Migreer naar de cloud voor superieure snelheid."
+  },
+  "opb_optimalisatie": {
+    "name": "OPB Optimalisatie",
+    "type": "LEGENDARY",
+    "power": 0,
+    "accuracy": 100,
+    "pp": 5,
+    "effect": { "type": "heal", "amount": 50, "chance": 1.0 },
+    "description": "Optimaliseer alle processen en herstel volledig."
+  }
+}

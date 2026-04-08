@@ -25,7 +25,7 @@ export const TILE_SIZE = 32;
 
 export const MAX_TEAM_SIZE = 6;
 export const MAX_MOVES = 4;
-export const MAX_LEVEL = 50;
+export const MAX_LEVEL = 99;
 export const BASE_XP = 50;
 
 export const TYPE_CHART = {

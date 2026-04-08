@@ -507,6 +507,51 @@ export class WorldScene extends Phaser.Scene {
         return;
       }
     }
+
+    // Easter egg: interact 3x with leftmost cake in entreecafe (3,9)
+    if (this.currentZone === 'entreecafe') {
+      for (const { dx, dy } of dirs) {
+        const checkX = this.playerGridX + dx;
+        const checkY = this.playerGridY + dy;
+        if (checkX === 3 && checkY === 9 &&
+            checkY < this.parsedMap.tiles.length &&
+            this.parsedMap.tiles[checkY][checkX] === 'tile_cake') {
+          this.easterEggCakeCount = (this.easterEggCakeCount || 0) + 1;
+          if (this.easterEggCakeCount < 3) {
+            const hints = [
+              'Hmm, die taart ziet er wel heel lekker uit...',
+              'Je ruikt de taart... er klopt iets niet. Is dat... pure kracht?',
+            ];
+            this.dialogSystem.show([{ speaker: 'Systeem', text: hints[this.easterEggCakeCount - 1] }]);
+            return;
+          }
+          this.easterEggCakeCount = 0;
+          const megaProjecto = new AFASmon('projecto', 99, {
+            nickname: 'MEGA Projecto',
+            isWild: false,
+          });
+          const added = this.inventory.addToTeam(megaProjecto);
+          this.inventory.setFlag('intro_done');
+          this.inventory.setFlag('got_starter');
+          const messages = [
+            { speaker: '???', text: 'De taart begint te gloeien...' },
+            { speaker: '???', text: 'Er springt een MEGA Projecto uit de taart! Level 99!' },
+          ];
+          if (added) {
+            messages.push({ speaker: 'Systeem', text: 'MEGA Projecto is toegevoegd aan je team!' });
+          } else {
+            messages.push({ speaker: 'Systeem', text: 'Je team is vol! Maak eerst plek.' });
+          }
+          messages.push({ speaker: 'Systeem', text: 'Je voelt een enorme kracht... De eerste missie is voltooid!' });
+          this.dialogSystem.show(messages, () => {
+            this.saveGame();
+            this.updateHUD();
+          });
+          return;
+        }
+      }
+      if (this.easterEggCakeCount > 0) this.easterEggCakeCount = 0;
+    }
   }
 
   interactWithNPC(npc) {

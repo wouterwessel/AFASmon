@@ -60,14 +60,14 @@ export class WorldScene extends Phaser.Scene {
     this.moveSpeed = 150; // ms per tile
 
     // Zone name display
-    this.zoneLabel = this.add.text(GAME_WIDTH / 2, 16, '', {
+    this.zoneLabel = this.add.text(GAME_WIDTH - 8, 8, '', {
       fontFamily: 'Arial, sans-serif',
       fontSize: '14px',
       color: '#ffffff',
       backgroundColor: '#00529C',
       padding: { x: 12, y: 4 },
       wordWrap: { width: GAME_WIDTH - 40 },
-    }).setOrigin(0.5).setDepth(500).setScrollFactor(0);
+    }).setOrigin(1, 0).setDepth(500).setScrollFactor(0);
 
     // Quest display (below zone label)
     this.questLabel = this.add.text(GAME_WIDTH / 2, 42, '', {
@@ -136,17 +136,40 @@ export class WorldScene extends Phaser.Scene {
     // Object tiles that are rendered on top of the floor tile
     const overlayTiles = new Set([
       'tile_plant', 'tile_cake', 'tile_table', 'tile_chair',
+      'tile_chair_up', 'tile_chair_left', 'tile_chair_right',
       'tile_laadpaal', 'tile_art_quinn', 'tile_desk', 'tile_koffie',
       'tile_car_left', 'tile_car_right',
     ]);
+
+    // Helper: get tile at position (for chair auto-rotation)
+    const getTile = (tx, ty) => {
+      if (ty >= 0 && ty < this.parsedMap.tiles.length && tx >= 0 && tx < this.parsedMap.tiles[ty].length) {
+        return this.parsedMap.tiles[ty][tx];
+      }
+      return null;
+    };
+    const isTableOrDesk = (key) => key === 'tile_table' || key === 'tile_desk';
 
     // Render tiles
     this.tileContainer = this.add.container(0, 0);
     for (let y = 0; y < this.parsedMap.tiles.length; y++) {
       for (let x = 0; x < this.parsedMap.tiles[y].length; x++) {
-        const tileKey = this.parsedMap.tiles[y][x];
+        let tileKey = this.parsedMap.tiles[y][x];
         const px = x * TILE_SIZE + TILE_SIZE / 2;
         const py = y * TILE_SIZE + TILE_SIZE / 2;
+
+        // Auto-rotate chairs toward adjacent table/desk
+        if (tileKey === 'tile_chair') {
+          const left = getTile(x - 1, y);
+          const right = getTile(x + 1, y);
+          const up = getTile(x, y - 1);
+          const down = getTile(x, y + 1);
+          if (isTableOrDesk(left)) tileKey = 'tile_chair_left';
+          else if (isTableOrDesk(right)) tileKey = 'tile_chair_right';
+          else if (isTableOrDesk(up)) tileKey = 'tile_chair_up';
+          else if (isTableOrDesk(down)) tileKey = 'tile_chair';
+          // default stays 'tile_chair' (facing down)
+        }
 
         // Always render floor underneath object tiles
         if (overlayTiles.has(tileKey) && this.textures.exists(this.mapData.floorTile)) {
@@ -220,7 +243,10 @@ export class WorldScene extends Phaser.Scene {
       const locked = !this.inventory.isZoneUnlocked(tp.target);
       const labelText = locked ? `🔒 ${destName}` : `→ ${destName}`;
       const labelColor = locked ? '#EF9A9A' : '#ffffff';
-      const label = this.add.text(tx, ty - 20, labelText, {
+      // Place label above door, but below door if it would go off-screen
+      const aboveDoor = ty - 20 >= 0;
+      const labelY = aboveDoor ? ty - 20 : ty + 20;
+      const label = this.add.text(tx, labelY, labelText, {
         fontFamily: 'Arial, sans-serif',
         fontSize: '10px',
         color: labelColor,

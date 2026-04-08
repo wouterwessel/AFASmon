@@ -498,14 +498,32 @@ export class BootScene extends Phaser.Scene {
       g.fillStyle(0xBDBDBD); g.fillRect(8, 22, 16, 5);
     });
     makeTile('chair', (g) => {
-      // Chair base/legs
+      // Chair facing down (backrest at top)
       g.fillStyle(0x37474F); g.fillRect(6, 24, 20, 4);
-      // Chair back
       g.fillStyle(0x455A64); g.fillRect(8, 2, 16, 10);
-      // Seat cushion
       g.fillStyle(0x546E7A); g.fillRect(6, 12, 20, 12);
-      // Lighter seat center
       g.fillStyle(0x607D8B); g.fillRect(10, 14, 12, 8);
+    });
+    makeTile('chair_up', (g) => {
+      // Chair facing up (backrest at bottom)
+      g.fillStyle(0x37474F); g.fillRect(6, 0, 20, 4);
+      g.fillStyle(0x455A64); g.fillRect(8, S - 12, 16, 10);
+      g.fillStyle(0x546E7A); g.fillRect(6, 4, 20, 12);
+      g.fillStyle(0x607D8B); g.fillRect(10, 6, 12, 8);
+    });
+    makeTile('chair_left', (g) => {
+      // Chair facing left (backrest at right)
+      g.fillStyle(0x37474F); g.fillRect(0, 6, 4, 20);
+      g.fillStyle(0x455A64); g.fillRect(S - 12, 8, 10, 16);
+      g.fillStyle(0x546E7A); g.fillRect(4, 6, 12, 20);
+      g.fillStyle(0x607D8B); g.fillRect(6, 10, 8, 12);
+    });
+    makeTile('chair_right', (g) => {
+      // Chair facing right (backrest at left)
+      g.fillStyle(0x37474F); g.fillRect(S - 4, 6, 4, 20);
+      g.fillStyle(0x455A64); g.fillRect(2, 8, 10, 16);
+      g.fillStyle(0x546E7A); g.fillRect(12, 6, 12, 20);
+      g.fillStyle(0x607D8B); g.fillRect(14, 10, 8, 12);
     });
     makeTile('door', (g) => {
       g.fillStyle(0xF57C00); g.fillRect(0, 0, S, S);

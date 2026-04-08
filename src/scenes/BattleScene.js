@@ -766,16 +766,26 @@ export class BattleScene extends Phaser.Scene {
         shakeMessages.push(`Gelukt! ${this.enemyMon.name} heeft het Contract getekend!`);
 
         this.showMessages(shakeMessages, () => {
+          // Award XP for catching
+          const xp = this.battleSystem.calculateXpGain(this.enemyMon, true);
+          const xpResult = this.playerMon.gainXp(xp);
+          this.updateInfoBox('player');
+
+          const catchMessages = [`${this.enemyMon.name} gevangen! +${xp} XP`];
+          if (xpResult.leveled) {
+            catchMessages.push(`${this.playerMon.name} is nu level ${this.playerMon.level}!`);
+          }
+
           this.enemyMon.isWild = false;
           if (this.inventory.addToTeam(this.enemyMon)) {
-            this.showMessage(`${this.enemyMon.name} is toegevoegd aan je team!`, () => {
-              this.returnToWorld();
-            });
+            catchMessages.push(`${this.enemyMon.name} is toegevoegd aan je team!`);
           } else {
-            this.showMessage('Je team is vol! Er is geen plek meer.', () => {
-              this.returnToWorld();
-            });
+            catchMessages.push('Je team is vol! Er is geen plek meer.');
           }
+
+          this.showMessages(catchMessages, () => {
+            this.returnToWorld();
+          });
         });
       } else {
         shakeMessages.push(`${this.enemyMon.name} weigert het Contract en breekt los!`);

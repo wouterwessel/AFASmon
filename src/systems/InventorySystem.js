@@ -12,7 +12,7 @@ export class InventorySystem {
       koffie: 3,
     };
     this.defeatedTrainers = [];
-    this.unlockedZones = ['parkeerplaats', 'atrium', 'kantoor', 'restaurant', 'collegezalen'];
+    this.unlockedZones = ['parkeerplaats', 'entreecafe', 'atrium', 'kantoor', 'restaurant', 'collegezalen'];
     this.badges = [];
     this.currentZone = 'parkeerplaats';
     this.storyFlags = {};
@@ -86,8 +86,8 @@ export class InventorySystem {
   }
 
   getCurrentQuest() {
-    if (!this.getFlag('intro_done')) return { title: 'Welkom bij AFAS', desc: 'Loop naar het Atrium en praat met Lisa bij de receptie.' };
-    if (!this.getFlag('got_starter')) return { title: 'Kies je AFASmon', desc: 'Praat met Lisa om je eerste AFASmon te kiezen.' };
+    if (!this.getFlag('intro_done')) return { title: 'Welkom bij AFAS', desc: 'Loop naar het Entreecafé en praat met Lisa.' };
+    if (!this.getFlag('got_starter')) return { title: 'Kies je AFASmon', desc: 'Praat met Lisa in het Entreecafé om je eerste AFASmon te kiezen.' };
     if (!this.isTrainerDefeated('junior_dev_1')) return { title: 'Eerste uitdaging', desc: 'Versla Tim in de Kantoorvleugel. (Links vanuit het Atrium)' };
     if (!this.isTrainerDefeated('junior_dev_2')) return { title: 'Bewijs jezelf', desc: 'Versla Cas in de Kantoorvleugel.' };
     if (!this.isTrainerDefeated('trainer_consultant')) return { title: 'Overleg!', desc: 'Versla Sophie in de Overlegruimtes. (Rechts van het Kantoor)' };

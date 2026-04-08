@@ -240,16 +240,19 @@ export class BootScene extends Phaser.Scene {
 
   generateNPCSprites() {
     const npcs = [
-      { key: 'npc_receptionist', color: 0x00529C, hair: 0xE0B050 },
-      { key: 'npc_consultant', color: 0x37474F, hair: 0x4A3728 },
-      { key: 'npc_developer', color: 0x1B5E20, hair: 0x212121 },
-      { key: 'npc_support', color: 0xF57C00, hair: 0xB71C1C },
-      { key: 'npc_marketing', color: 0xE91E63, hair: 0xFFD54F },
-      { key: 'npc_trainer', color: 0x7B1FA2, hair: 0x5D4037 },
-      { key: 'npc_ceo', color: 0x212121, hair: 0x616161 },
+      { key: 'npc_receptionist', color: 0x00529C, hair: 0xE0B050, female: true },
+      { key: 'npc_consultant', color: 0x37474F, hair: 0x4A3728, female: false },
+      { key: 'npc_consultant_f', color: 0x37474F, hair: 0x4A3728, female: true },
+      { key: 'npc_developer', color: 0x1B5E20, hair: 0x212121, female: false },
+      { key: 'npc_support', color: 0xF57C00, hair: 0xB71C1C, female: true },
+      { key: 'npc_marketing', color: 0xE91E63, hair: 0xFFD54F, female: false },
+      { key: 'npc_marketing_f', color: 0xE91E63, hair: 0xFFD54F, female: true },
+      { key: 'npc_trainer', color: 0x7B1FA2, hair: 0x5D4037, female: false },
+      { key: 'npc_trainer_f', color: 0x7B1FA2, hair: 0x5D4037, female: true },
+      { key: 'npc_ceo', color: 0x212121, hair: 0x616161, female: false },
     ];
 
-    npcs.forEach(({ key, color, hair }) => {
+    npcs.forEach(({ key, color, hair, female }) => {
       const g = this.make.graphics({ add: false });
       // Body
       g.fillStyle(color);
@@ -259,7 +262,15 @@ export class BootScene extends Phaser.Scene {
       g.fillCircle(16, 8, 7);
       // Hair
       g.fillStyle(hair);
-      g.fillRect(9, 2, 14, 5);
+      if (female) {
+        // Longer hair — top + sides falling to shoulders
+        g.fillRect(9, 1, 14, 6);
+        g.fillRect(7, 1, 4, 14);
+        g.fillRect(21, 1, 4, 14);
+      } else {
+        // Short hair — top only
+        g.fillRect(9, 2, 14, 5);
+      }
       // Eyes
       g.fillStyle(0x000000);
       g.fillRect(12, 7, 2, 2);
@@ -379,105 +390,295 @@ export class BootScene extends Phaser.Scene {
   }
 
   generateTileset() {
-    const tileTypes = {
-      floor_office: { color: 0xCFD8DC, pattern: 'grid' },
-      floor_atrium: { color: 0xE8EEF4, pattern: 'marble' },
-      floor_restaurant: { color: 0xD7CCC8, pattern: 'tile' },
-      floor_theater: { color: 0x8D6E63, pattern: 'wood' },
-      floor_sport: { color: 0x81C784, pattern: 'lines' },
-      floor_garage: { color: 0x616161, pattern: 'concrete' },
-      floor_outside: { color: 0x7CB342, pattern: 'grass' },
-      floor_path: { color: 0xBDBDBD, pattern: 'stone' },
-      wall: { color: 0x455A64, pattern: 'solid' },
-      wall_glass: { color: 0xB3E5FC, pattern: 'glass' },
-      desk: { color: 0x795548, pattern: 'solid' },
-      chair: { color: 0x37474F, pattern: 'solid' },
-      door: { color: 0xF57C00, pattern: 'solid' },
-      solar_panel: { color: 0x1A237E, pattern: 'grid' },
-      plant: { color: 0x2E7D32, pattern: 'solid' },
-      water: { color: 0x1565C0, pattern: 'wave' },
-      car: { color: 0x78909C, pattern: 'solid' },
-      laadpaal: { color: 0x4CAF50, pattern: 'solid' },
-      art_quinn: { color: 0xFFD700, pattern: 'solid' },
-      counter: { color: 0x6D4C41, pattern: 'solid' },
-      piano: { color: 0x1A1A1A, pattern: 'solid' },
-      piano_keys: { color: 0x1A1A1A, pattern: 'piano' },
+    const S = TILE_SIZE;
+
+    // Helper to create a tile texture with a custom draw function
+    const makeTile = (name, drawFn) => {
+      const g = this.make.graphics({ add: false });
+      drawFn(g, S);
+      g.generateTexture(`tile_${name}`, S, S);
+      g.destroy();
     };
 
-    Object.entries(tileTypes).forEach(([key, { color, pattern }]) => {
-      const g = this.make.graphics({ add: false });
-      g.fillStyle(color);
-      g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+    // --- Floor tiles ---
+    makeTile('floor_office', (g) => {
+      g.fillStyle(0xCFD8DC); g.fillRect(0, 0, S, S);
+      g.lineStyle(1, 0x000000, 0.1);
+      g.lineBetween(S / 2, 0, S / 2, S);
+      g.lineBetween(0, S / 2, S, S / 2);
+    });
+    makeTile('floor_atrium', (g) => {
+      g.fillStyle(0xE8EEF4); g.fillRect(0, 0, S, S);
+      g.fillStyle(0xFFFFFF, 0.15);
+      g.fillRect(0, 0, S / 2, S / 2);
+      g.fillRect(S / 2, S / 2, S / 2, S / 2);
+    });
+    makeTile('floor_restaurant', (g) => {
+      g.fillStyle(0xD7CCC8); g.fillRect(0, 0, S, S);
+      g.lineStyle(1, 0x000000, 0.15);
+      g.strokeRect(1, 1, S - 2, S - 2);
+    });
+    makeTile('floor_theater', (g) => {
+      g.fillStyle(0x8D6E63); g.fillRect(0, 0, S, S);
+      g.lineStyle(1, 0x6D4C41, 0.2);
+      for (let i = 0; i < 5; i++) g.lineBetween(0, i * 7, S, i * 7);
+    });
+    makeTile('floor_sport', (g) => {
+      g.fillStyle(0x81C784); g.fillRect(0, 0, S, S);
+      g.lineStyle(1, 0xFFFFFF, 0.2);
+      g.lineBetween(0, S / 3, S, S / 3);
+      g.lineBetween(0, (S * 2) / 3, S, (S * 2) / 3);
+    });
+    makeTile('floor_garage', (g) => {
+      g.fillStyle(0x616161); g.fillRect(0, 0, S, S);
+      g.fillStyle(0x000000, 0.08);
+      g.fillRect(4, 4, 3, 3);
+      g.fillRect(20, 14, 2, 2);
+      g.fillRect(12, 24, 3, 2);
+    });
+    makeTile('floor_outside', (g) => {
+      g.fillStyle(0x7CB342); g.fillRect(0, 0, S, S);
+      g.fillStyle(0x558B2F, 0.3);
+      g.fillRect(3, 5, 2, 4); g.fillRect(15, 2, 2, 5);
+      g.fillRect(25, 18, 2, 4); g.fillRect(8, 22, 2, 5);
+    });
+    makeTile('floor_path', (g) => {
+      g.fillStyle(0xBDBDBD); g.fillRect(0, 0, S, S);
+      g.lineStyle(1, 0x000000, 0.1);
+      g.lineBetween(0, S / 2, S, S / 2);
+      g.lineBetween(S / 3, 0, S / 3, S / 2);
+      g.lineBetween(S * 2 / 3, S / 2, S * 2 / 3, S);
+    });
+    // Entreecafé wooden floor — warm brown with visible grain
+    makeTile('floor_wood', (g) => {
+      g.fillStyle(0xA1887F); g.fillRect(0, 0, S, S);
+      g.lineStyle(1, 0x795548, 0.25);
+      for (let i = 0; i < 6; i++) g.lineBetween(0, i * 6, S, i * 6);
+      g.fillStyle(0x8D6E63, 0.15);
+      g.fillRect(0, 0, S / 2, S / 2);
+      g.fillRect(S / 2, S / 2, S / 2, S / 2);
+    });
 
-      switch (pattern) {
-        case 'grid':
-          g.lineStyle(1, 0x000000, 0.1);
-          g.lineBetween(TILE_SIZE / 2, 0, TILE_SIZE / 2, TILE_SIZE);
-          g.lineBetween(0, TILE_SIZE / 2, TILE_SIZE, TILE_SIZE / 2);
-          break;
-        case 'marble':
-          g.fillStyle(0xFFFFFF, 0.15);
-          g.fillRect(0, 0, TILE_SIZE / 2, TILE_SIZE / 2);
-          g.fillRect(TILE_SIZE / 2, TILE_SIZE / 2, TILE_SIZE / 2, TILE_SIZE / 2);
-          break;
-        case 'tile':
-          g.lineStyle(1, 0x000000, 0.15);
-          g.strokeRect(1, 1, TILE_SIZE - 2, TILE_SIZE - 2);
-          break;
-        case 'wood':
-          g.lineStyle(1, 0x000000, 0.08);
-          for (let i = 0; i < 5; i++) {
-            g.lineBetween(0, i * 7, TILE_SIZE, i * 7);
-          }
-          break;
-        case 'lines':
-          g.lineStyle(1, 0xFFFFFF, 0.2);
-          g.lineBetween(0, TILE_SIZE / 3, TILE_SIZE, TILE_SIZE / 3);
-          g.lineBetween(0, (TILE_SIZE * 2) / 3, TILE_SIZE, (TILE_SIZE * 2) / 3);
-          break;
-        case 'concrete':
-          g.fillStyle(0x000000, 0.08);
-          g.fillRect(4, 4, 3, 3);
-          g.fillRect(20, 14, 2, 2);
-          g.fillRect(12, 24, 3, 2);
-          break;
-        case 'piano':
-          g.fillStyle(0xFFFFFF, 0.9);
-          for (let i = 0; i < 6; i++) {
-            g.fillRect(2 + i * 5, TILE_SIZE - 10, 3, 8);
-          }
-          g.fillStyle(0x333333, 0.6);
-          for (let i = 0; i < 5; i++) {
-            g.fillRect(4 + i * 5, TILE_SIZE - 10, 2, 5);
-          }
-          break;
-        case 'grass':
-          g.fillStyle(0x558B2F, 0.3);
-          g.fillRect(3, 5, 2, 4);
-          g.fillRect(15, 2, 2, 5);
-          g.fillRect(25, 18, 2, 4);
-          g.fillRect(8, 22, 2, 5);
-          break;
-        case 'stone':
-          g.lineStyle(1, 0x000000, 0.1);
-          g.lineBetween(0, TILE_SIZE / 2, TILE_SIZE, TILE_SIZE / 2);
-          g.lineBetween(TILE_SIZE / 3, 0, TILE_SIZE / 3, TILE_SIZE / 2);
-          g.lineBetween(TILE_SIZE * 2 / 3, TILE_SIZE / 2, TILE_SIZE * 2 / 3, TILE_SIZE);
-          break;
-        case 'glass':
-          g.fillStyle(0xFFFFFF, 0.3);
-          g.fillRect(2, 2, 4, TILE_SIZE - 4);
-          g.fillRect(TILE_SIZE - 6, 2, 4, TILE_SIZE - 4);
-          break;
-        case 'wave':
-          g.fillStyle(0x1976D2, 0.3);
-          g.fillRect(0, 8, TILE_SIZE, 4);
-          g.fillRect(0, 20, TILE_SIZE, 4);
-          break;
-      }
+    // --- Wall tiles ---
+    makeTile('wall', (g) => {
+      g.fillStyle(0x455A64); g.fillRect(0, 0, S, S);
+      // Mortar/brick lines
+      g.lineStyle(1, 0x37474F, 0.4);
+      g.lineBetween(0, 8, S, 8);
+      g.lineBetween(0, 16, S, 16);
+      g.lineBetween(0, 24, S, 24);
+      g.lineBetween(S / 2, 0, S / 2, 8);
+      g.lineBetween(0, 8, 0, 16);
+      g.lineBetween(S / 2, 16, S / 2, 24);
+    });
+    makeTile('wall_glass', (g) => {
+      g.fillStyle(0xB3E5FC); g.fillRect(0, 0, S, S);
+      g.fillStyle(0xFFFFFF, 0.3);
+      g.fillRect(2, 2, 4, S - 4);
+      g.fillRect(S - 6, 2, 4, S - 4);
+      // Reflection highlight
+      g.fillStyle(0xFFFFFF, 0.2);
+      g.fillRect(8, 4, 6, 3);
+    });
 
-      g.generateTexture(`tile_${key}`, TILE_SIZE, TILE_SIZE);
-      g.destroy();
+    // --- Furniture tiles ---
+    makeTile('desk', (g) => {
+      // Brown desk surface
+      g.fillStyle(0x795548); g.fillRect(0, 0, S, S);
+      g.fillStyle(0x6D4C41); g.fillRect(2, 2, S - 4, S - 4);
+      // Monitor on desk
+      g.fillStyle(0x90A4AE); g.fillRect(8, 3, 16, 12);
+      g.fillStyle(0x263238); g.fillRect(10, 5, 12, 8);
+      // Monitor stand
+      g.fillStyle(0x78909C); g.fillRect(14, 15, 4, 3);
+      // Keyboard
+      g.fillStyle(0xBDBDBD); g.fillRect(8, 22, 16, 5);
+    });
+    makeTile('chair', (g) => {
+      // Chair base/legs
+      g.fillStyle(0x37474F); g.fillRect(6, 24, 20, 4);
+      // Chair back
+      g.fillStyle(0x455A64); g.fillRect(8, 2, 16, 10);
+      // Seat cushion
+      g.fillStyle(0x546E7A); g.fillRect(6, 12, 20, 12);
+      // Lighter seat center
+      g.fillStyle(0x607D8B); g.fillRect(10, 14, 12, 8);
+    });
+    makeTile('door', (g) => {
+      g.fillStyle(0xF57C00); g.fillRect(0, 0, S, S);
+      g.fillStyle(0xE65100); g.fillRect(4, 2, S - 8, S - 4);
+      // Door handle
+      g.fillStyle(0xFFD54F); g.fillCircle(S - 8, S / 2, 2);
+    });
+
+    // --- Object tiles ---
+    makeTile('solar_panel', (g) => {
+      g.fillStyle(0x1A237E); g.fillRect(0, 0, S, S);
+      g.lineStyle(1, 0x42A5F5, 0.3);
+      g.lineBetween(S / 2, 0, S / 2, S);
+      g.lineBetween(0, S / 2, S, S / 2);
+      // Shiny cell
+      g.fillStyle(0x283593, 0.5);
+      g.fillRect(2, 2, S / 2 - 3, S / 2 - 3);
+      g.fillRect(S / 2 + 1, S / 2 + 1, S / 2 - 3, S / 2 - 3);
+    });
+    makeTile('plant', (g) => {
+      // Pot
+      g.fillStyle(0x8D6E63); g.fillRect(8, 20, 16, 10);
+      g.fillStyle(0x6D4C41); g.fillRect(10, 18, 12, 4);
+      // Leaves
+      g.fillStyle(0x388E3C); g.fillCircle(16, 10, 8);
+      g.fillStyle(0x2E7D32); g.fillCircle(12, 12, 6);
+      g.fillStyle(0x4CAF50); g.fillCircle(18, 8, 5);
+      // Stem
+      g.fillStyle(0x5D4037); g.fillRect(14, 14, 4, 6);
+    });
+    makeTile('water', (g) => {
+      g.fillStyle(0x1565C0); g.fillRect(0, 0, S, S);
+      // Wave highlights
+      g.fillStyle(0x1976D2, 0.4);
+      g.fillRect(0, 6, S, 4);
+      g.fillRect(0, 18, S, 4);
+      // Sparkle
+      g.fillStyle(0x64B5F6, 0.3);
+      g.fillRect(6, 2, 3, 2);
+      g.fillRect(20, 14, 3, 2);
+    });
+    makeTile('car_left', (g) => {
+      // Parking floor
+      g.fillStyle(0x757575); g.fillRect(0, 0, S, S);
+      // Car body left half (hood side)
+      g.fillStyle(0x90A4AE); g.fillRect(2, 6, S - 2, 16);
+      // Hood
+      g.fillStyle(0x78909C); g.fillRect(2, 4, S - 2, 8);
+      // Windshield
+      g.fillStyle(0xB3E5FC); g.fillRect(6, 5, S - 8, 6);
+      // Left wheel
+      g.fillStyle(0x212121); g.fillRect(4, 22, 8, 5);
+      // Headlight
+      g.fillStyle(0xFFF176); g.fillRect(2, 10, 3, 3);
+      // Side mirror
+      g.fillStyle(0x78909C); g.fillRect(0, 10, 3, 2);
+    });
+    makeTile('car_right', (g) => {
+      // Parking floor
+      g.fillStyle(0x757575); g.fillRect(0, 0, S, S);
+      // Car body right half (trunk side)
+      g.fillStyle(0x90A4AE); g.fillRect(0, 6, S - 2, 16);
+      // Trunk
+      g.fillStyle(0x78909C); g.fillRect(0, 4, S - 2, 8);
+      // Rear window
+      g.fillStyle(0xB3E5FC); g.fillRect(2, 5, S - 8, 6);
+      // Right wheel
+      g.fillStyle(0x212121); g.fillRect(S - 12, 22, 8, 5);
+      // Tail light
+      g.fillStyle(0xE53935); g.fillRect(S - 5, 10, 3, 3);
+      // Side mirror
+      g.fillStyle(0x78909C); g.fillRect(S - 3, 10, 3, 2);
+    });
+    makeTile('laadpaal', (g) => {
+      // Pole
+      g.fillStyle(0x4CAF50); g.fillRect(12, 4, 8, 24);
+      // Screen
+      g.fillStyle(0xC8E6C9); g.fillRect(14, 6, 4, 6);
+      // Cable
+      g.fillStyle(0x333333); g.fillRect(10, 20, 2, 8);
+      // Plug
+      g.fillStyle(0x666666); g.fillRect(8, 26, 4, 3);
+    });
+    makeTile('art_quinn', (g) => {
+      // Sculpture - golden abstract shape
+      g.fillStyle(0xFFD700); g.fillCircle(16, 14, 10);
+      g.fillStyle(0xFFC107); g.fillRect(10, 8, 12, 16);
+      // Hands reaching up
+      g.fillStyle(0xFFD700);
+      g.fillRect(8, 4, 4, 10);
+      g.fillRect(20, 4, 4, 10);
+      // Highlight
+      g.fillStyle(0xFFE082, 0.5); g.fillRect(14, 10, 4, 8);
+    });
+    makeTile('counter', (g) => {
+      // Counter/bar surface
+      g.fillStyle(0x6D4C41); g.fillRect(0, 0, S, S);
+      // Lighter top edge (bar rail)
+      g.fillStyle(0x8D6E63); g.fillRect(0, 0, S, 6);
+      // Front panel detail
+      g.fillStyle(0x5D4037); g.fillRect(2, 8, S - 4, S - 10);
+      g.lineStyle(1, 0x4E342E, 0.3);
+      g.lineBetween(S / 2, 8, S / 2, S);
+    });
+    makeTile('piano', (g) => {
+      g.fillStyle(0x1A1A1A); g.fillRect(0, 0, S, S);
+      // Piano body shine
+      g.fillStyle(0x333333, 0.4);
+      g.fillRect(2, 2, S - 4, 4);
+    });
+    makeTile('piano_keys', (g) => {
+      g.fillStyle(0x1A1A1A); g.fillRect(0, 0, S, S);
+      // White keys
+      g.fillStyle(0xFFFFFF, 0.9);
+      for (let i = 0; i < 6; i++) g.fillRect(2 + i * 5, S - 10, 3, 8);
+      // Black keys
+      g.fillStyle(0x333333, 0.6);
+      for (let i = 0; i < 5; i++) g.fillRect(4 + i * 5, S - 10, 2, 5);
+    });
+
+    // --- New tiles for Entreecafé ---
+    makeTile('bar', (g) => {
+      // Bar counter
+      g.fillStyle(0x5D4037); g.fillRect(0, 0, S, S);
+      // Polished top
+      g.fillStyle(0x8D6E63); g.fillRect(0, 0, S, 8);
+      // Bottles/glasses on shelf
+      g.fillStyle(0xBDBDBD);
+      g.fillRect(4, 12, 4, 8);
+      g.fillRect(12, 10, 4, 10);
+      g.fillRect(22, 12, 4, 8);
+      // Shelf line
+      g.lineStyle(1, 0x4E342E, 0.5);
+      g.lineBetween(0, 22, S, 22);
+    });
+    makeTile('koffie', (g) => {
+      // Machine body
+      g.fillStyle(0x4E342E); g.fillRect(0, 0, S, S);
+      g.fillStyle(0x3E2723); g.fillRect(2, 2, S - 4, S - 4);
+      // Cup slot
+      g.fillStyle(0x795548); g.fillRect(8, 18, 16, 10);
+      // White cup
+      g.fillStyle(0xFFFFFF); g.fillRect(12, 20, 8, 7);
+      // Coffee in cup
+      g.fillStyle(0x4E342E); g.fillRect(13, 21, 6, 4);
+      // Display/buttons
+      g.fillStyle(0x81D4FA); g.fillRect(8, 4, 16, 8);
+      // Steam
+      g.fillStyle(0xFFFFFF, 0.3);
+      g.fillRect(14, 14, 2, 4);
+      g.fillRect(17, 15, 2, 3);
+    });
+    makeTile('cake', (g) => {
+      // Display case
+      g.fillStyle(0xF5F5F5); g.fillRect(4, 4, S - 8, S - 8);
+      g.lineStyle(1, 0xE0E0E0, 0.5);
+      g.strokeRect(4, 4, S - 8, S - 8);
+      // Cake base
+      g.fillStyle(0xFFCC80); g.fillRect(6, 14, 20, 10);
+      // Frosting
+      g.fillStyle(0xFFF9C4); g.fillRect(6, 12, 20, 4);
+      // Strawberry on top
+      g.fillStyle(0xE53935); g.fillCircle(16, 10, 4);
+      g.fillStyle(0x4CAF50); g.fillRect(15, 6, 3, 3);
+    });
+    makeTile('table', (g) => {
+      // Table top
+      g.fillStyle(0xBCAAA4); g.fillRect(4, 4, S - 8, S - 8);
+      g.lineStyle(1, 0x8D6E63, 0.3);
+      g.strokeRect(4, 4, S - 8, S - 8);
+      // Table legs (corners)
+      g.fillStyle(0x6D4C41);
+      g.fillRect(4, 4, 3, 3);
+      g.fillRect(S - 7, 4, 3, 3);
+      g.fillRect(4, S - 7, 3, 3);
+      g.fillRect(S - 7, S - 7, 3, 3);
     });
   }
 

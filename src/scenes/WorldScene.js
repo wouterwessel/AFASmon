@@ -66,6 +66,7 @@ export class WorldScene extends Phaser.Scene {
       color: '#ffffff',
       backgroundColor: '#00529C',
       padding: { x: 12, y: 4 },
+      wordWrap: { width: GAME_WIDTH - 40 },
     }).setOrigin(0.5).setDepth(500).setScrollFactor(0);
 
     // Quest display (below zone label)
@@ -75,6 +76,7 @@ export class WorldScene extends Phaser.Scene {
       color: '#FFE0B2',
       backgroundColor: 'rgba(0,0,0,0.5)',
       padding: { x: 10, y: 3 },
+      wordWrap: { width: GAME_WIDTH - 40 },
     }).setOrigin(0.5).setDepth(500).setScrollFactor(0);
 
     // Mini HUD
@@ -94,7 +96,7 @@ export class WorldScene extends Phaser.Scene {
           { speaker: 'Verteller', text: 'Het imposante kunstwerk "You are the World" van Lorenzo Quinn verwelkomt je. Indrukwekkend!' },
           { speaker: 'Verteller', text: 'Dit is je eerste dag als stagiair bij AFAS Software, {name}. Maar iets voelt... anders.' },
           { speaker: 'Verteller', text: 'Overal in het gebouw lopen vreemde digitale wezens rond. Softwaremodules... die leven?!' },
-          { speaker: 'Verteller', text: 'Loop naar het zuiden, het Atrium in, en praat met Lisa bij de receptie. Zij weet vast meer!' },
+          { speaker: 'Verteller', text: 'Loop naar het zuiden, het Entreecafé in, en praat met Lisa. Zij weet vast meer!' },
           { speaker: 'Verteller', text: 'Gebruik pijltjestoetsen of WASD om te bewegen. Druk op E om te praten. M opent je team.' },
         ], () => {
           this.inventory.setFlag('intro_done');
@@ -131,13 +133,29 @@ export class WorldScene extends Phaser.Scene {
     this.currentZone = zoneName;
     this.inventory.currentZone = zoneName;
 
+    // Object tiles that are rendered on top of the floor tile
+    const overlayTiles = new Set([
+      'tile_plant', 'tile_cake', 'tile_table', 'tile_chair',
+      'tile_laadpaal', 'tile_art_quinn', 'tile_desk', 'tile_koffie',
+      'tile_car_left', 'tile_car_right',
+    ]);
+
     // Render tiles
     this.tileContainer = this.add.container(0, 0);
     for (let y = 0; y < this.parsedMap.tiles.length; y++) {
       for (let x = 0; x < this.parsedMap.tiles[y].length; x++) {
         const tileKey = this.parsedMap.tiles[y][x];
+        const px = x * TILE_SIZE + TILE_SIZE / 2;
+        const py = y * TILE_SIZE + TILE_SIZE / 2;
+
+        // Always render floor underneath object tiles
+        if (overlayTiles.has(tileKey) && this.textures.exists(this.mapData.floorTile)) {
+          const floor = this.add.image(px, py, this.mapData.floorTile);
+          this.tileContainer.add(floor);
+        }
+
         if (this.textures.exists(tileKey)) {
-          const tile = this.add.image(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, tileKey);
+          const tile = this.add.image(px, py, tileKey);
           this.tileContainer.add(tile);
         } else {
           // Fallback colored rectangle
@@ -152,7 +170,8 @@ export class WorldScene extends Phaser.Scene {
             tile_counter: 0x6D4C41,
             tile_laadpaal: 0x4CAF50,
             tile_solar_panel: 0x1A237E,
-            tile_car: 0x78909C,
+            tile_car_left: 0x78909C,
+            tile_car_right: 0x78909C,
             tile_door: 0xF57C00,
           };
           const color = colors[tileKey] || 0x888888;
@@ -180,6 +199,7 @@ export class WorldScene extends Phaser.Scene {
     // Render transition indicators with destination labels
     const doorZoneNames = {
       parkeerplaats: 'Parkeerplaats',
+      entreecafe: 'Entreecafé',
       atrium: 'Atrium',
       kantoor: 'Kantoor',
       overlegruimtes: 'Overlegruimtes',
@@ -195,8 +215,6 @@ export class WorldScene extends Phaser.Scene {
     this.parsedMap.transitionPoints.forEach(tp => {
       const tx = tp.x * TILE_SIZE + TILE_SIZE / 2;
       const ty = tp.y * TILE_SIZE + TILE_SIZE / 2;
-      const arrow = this.add.text(tx, ty, '🚪', { fontSize: '20px' }).setOrigin(0.5);
-      this.tileContainer.add(arrow);
 
       const destName = doorZoneNames[tp.target] || tp.target;
       const locked = !this.inventory.isZoneUnlocked(tp.target);
@@ -275,6 +293,7 @@ export class WorldScene extends Phaser.Scene {
     const zoneNames = {
       parkeerplaats: '🅿️ Parkeerplaats',
       buitentuin: '🌿 Buitentuin',
+      entreecafe: '☕ Entreecafé',
       atrium: '🏛️ Atrium & Binnentuin',
       kantoor: '💼 Kantoorvleugel',
       overlegruimtes: '🤝 Overlegruimtes',
@@ -425,16 +444,54 @@ export class WorldScene extends Phaser.Scene {
         return;
       }
     }
+
+    // Check for NPCs behind a counter (distance 2, counter tile in between)
+    for (const { dx, dy } of dirs) {
+      if (dx === 0 && dy === 0) continue;
+      const midX = this.playerGridX + dx;
+      const midY = this.playerGridY + dy;
+      const farX = this.playerGridX + dx * 2;
+      const farY = this.playerGridY + dy * 2;
+      if (midY >= 0 && midY < this.parsedMap.tiles.length &&
+          midX >= 0 && midX < this.parsedMap.tiles[midY].length &&
+          this.parsedMap.tiles[midY][midX] === 'tile_counter') {
+        const npc = this.npcSprites?.find(n => n.x === farX && n.y === farY);
+        if (npc) {
+          this.interactWithNPC(npc);
+          return;
+        }
+      }
+    }
+
+    // Check for koffieautomaat tile
+    for (const { dx, dy } of dirs) {
+      const checkX = this.playerGridX + dx;
+      const checkY = this.playerGridY + dy;
+      if (checkY >= 0 && checkY < this.parsedMap.tiles.length &&
+          checkX >= 0 && checkX < this.parsedMap.tiles[checkY].length &&
+          this.parsedMap.tiles[checkY][checkX] === 'tile_koffie') {
+        this.dialogSystem.show([
+          { speaker: 'Systeem', text: 'Je neemt een verse kop koffie. Het aroma vult de ruimte! ☕' },
+          { speaker: 'Systeem', text: 'Je hele team voelt zich verfrist! Spel opgeslagen.' },
+        ], () => {
+          this.inventory.healTeam();
+          this.saveGame();
+          this.updateHUD();
+        });
+        return;
+      }
+    }
   }
 
   interactWithNPC(npc) {
     // Infobalie — dynamic quest-based dialog
     if (npc.isInfobalie) {
       const quest = this.inventory.getCurrentQuest();
+      const firstName = npc.name.split(' ').pop();
       const hints = [
-        { speaker: 'Infobalie', text: `Welkom bij de infobalie, {name}! Kan ik je ergens mee helpen?` },
-        { speaker: 'Infobalie', text: `Je huidige missie: "${quest.title}"` },
-        { speaker: 'Infobalie', text: quest.desc },
+        { speaker: firstName, text: `Welkom bij de infobalie, {name}! Ik ben ${firstName}. Kan ik je ergens mee helpen?` },
+        { speaker: firstName, text: `Je huidige missie: "${quest.title}"` },
+        { speaker: firstName, text: quest.desc },
       ];
       this.dialogSystem.show(hints);
       return;

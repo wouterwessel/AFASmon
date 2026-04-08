@@ -15,13 +15,18 @@ import { TILE_SIZE } from '../utils/constants.js';
 //   R = counter (reception/restaurant)
 //   L = laadpaal
 //   S = solar panel
-//   X = car
+//   X = car (left half)
+//   Z = car (right half)
 //   N = NPC spawn point (walkable)
 //   E = encounter zone (walkable, random battles)
 //   H = heal point
 //   T = transition to another zone
 //   V = vleugelpiano body (zwart)
 //   F = vleugelpiano toetsen (front)
+//   B = bar counter
+//   Q = koffieautomaat
+//   I = cake/taartjes vitrine
+//   J = table
 
 const MAPS = {
   parkeerplaats: {
@@ -34,13 +39,13 @@ const MAPS = {
     tiles: [
       '#########################',
       '#.......................#',
-      '#..XX..XX..XX..XX..XX...#',
+      '#..XZ..XZ..XZ..XZ..XZ...#',
       '#.......................#',
-      '#..XX..XX..LL..XX..XX...#',
+      '#..XZ..XZ..LL..XZ..XZ...#',
       '#.......................#',
-      '#..XX..LL..XX..XX..LL...#',
+      '#..XZ..LL..XZ..XZ..LL...#',
       '#.......................#',
-      '#..XX..XX..XX..XX..XX...#',
+      '#..XZ..XZ..XZ..XZ..XZ...#',
       '#.......................#',
       '#..........A............#',
       '#.......................#',
@@ -53,7 +58,7 @@ const MAPS = {
       '#########################',
     ],
     transitions: [
-      { char: 'T', target: 'atrium', spawnX: 11, spawnY: 0 },
+      { char: 'T', target: 'entreecafe', spawnX: 11, spawnY: 12 },
     ],
     npcs: [],
   },
@@ -93,47 +98,40 @@ const MAPS = {
     npcs: [],
   },
 
-  atrium: {
+  entreecafe: {
     width: 25,
-    height: 19,
-    floorTile: 'tile_floor_atrium',
+    height: 15,
+    floorTile: 'tile_floor_wood',
     encounterRate: 0,
     encounterMons: [],
     encounterLevels: [1, 1],
     tiles: [
-      '#####GGG###T###GGG######',
+      '#####GGGGG#T#GGGGG######',
       '#......................#',
-      '#..R..........R........#',
-      '#..R..........R........#',
+      '#..BBBBBB......Q.......#',
+      '#..N...........N.......#',
       '#......................#',
-      '#..N...................#',
+      '#...JCJ..JCJ..JCJ..P..#',
+      '#........N.............#',
+      '#...JCJ..JCJ..JCJ..P..#',
       '#......................#',
-      'T.......PPPP...........T',
-      '#.......PWWP...........#',
-      '#.......PWAP...........#',
-      '#.......PPPP...........#',
+      '#..III..............P..#',
       '#......................#',
-      'T......................T',
+      '#..PP..............PP..#',
       '#......................#',
-      '#......................#',
-      '#...........N..........#',
-      '#......................#',
-      '#####GGG#####GGG######.#',
+      '#...........T..........#',
       '########################',
     ],
     transitions: [
-      { char: 'T', target: 'parkeerplaats', spawnX: 11, spawnY: 14, index: 0 },
-      { char: 'T', target: 'kantoor', spawnX: 0, spawnY: 8, index: 1 },
-      { char: 'T', target: 'restaurant', spawnX: 0, spawnY: 8, index: 2 },
-      { char: 'T', target: 'collegezalen', spawnX: 12, spawnY: 1, index: 3 },
-      { char: 'T', target: 'theater', spawnX: 12, spawnY: 1, index: 4 },
+      { char: 'T', target: 'atrium', spawnX: 12, spawnY: 16 },
+      { char: 'T', target: 'parkeerplaats', spawnX: 11, spawnY: 16 },
     ],
     npcs: [
       {
         id: 'receptionist',
         sprite: 'npc_receptionist',
-        x: 5,
-        y: 5,
+        x: 3,
+        y: 3,
         name: 'Lisa de Receptionist',
         dialog: [
           { speaker: 'Lisa', text: 'Welkom bij AFAS, {name}! Wat fijn dat je er bent! Ik ben Lisa, de receptionist.' },
@@ -145,24 +143,64 @@ const MAPS = {
         isTrainer: false,
       },
       {
-        id: 'save_point',
-        sprite: 'npc_consultant',
-        x: 11,
-        y: 15,
-        name: 'Koffie-automaat',
+        id: 'hospitality',
+        sprite: 'npc_marketing_f',
+        x: 9,
+        y: 6,
+        name: 'Hospitality Medewerker Esmee',
         dialog: [
-          { speaker: 'Systeem', text: 'Je neemt een slokje koffie. Je voelt je verfrist! Spel opgeslagen.' },
+          { speaker: 'Esmee', text: 'Hey {name}! Welkom in het Entreecafé! Ik ben Esmee van Hospitality.' },
+          { speaker: 'Esmee', text: 'Dit is het hart van het Clubhuis — lekker koffie, taartjes, en gezelligheid.' },
+          { speaker: 'Esmee', text: 'Loop door naar het noorden voor het Atrium. Daar kun je naar alle andere ruimtes!' },
+          { speaker: 'Esmee', text: 'En vergeet de koffieautomaat niet — die herstelt je hele team gratis. ☕' },
         ],
-        heals: true,
-        saves: true,
         isTrainer: false,
       },
+    ],
+  },
+
+  atrium: {
+    width: 25,
+    height: 19,
+    floorTile: 'tile_floor_atrium',
+    encounterRate: 0,
+    encounterMons: [],
+    encounterLevels: [1, 1],
+    tiles: [
+      '#####GGG#######GGG######',
+      '#......................#',
+      '#..PP..............PP..#',
+      '#......................#',
+      '#......................#',
+      '#.....RRRRRRRR.........#',
+      '#.....R......R.........#',
+      'T.....R..N...R.........T',
+      '#.....RRRRRRRR.........#',
+      '#......................#',
+      '#......................#',
+      '#..PP..............PP..#',
+      'T......................T',
+      '#......................#',
+      '#......................#',
+      '#......................#',
+      '#......................#',
+      '#####GGG##T##GGG######.#',
+      '########################',
+    ],
+    transitions: [
+      { char: 'T', target: 'kantoor', spawnX: 0, spawnY: 8, index: 0 },
+      { char: 'T', target: 'restaurant', spawnX: 0, spawnY: 8, index: 1 },
+      { char: 'T', target: 'collegezalen', spawnX: 12, spawnY: 1, index: 2 },
+      { char: 'T', target: 'theater', spawnX: 12, spawnY: 1, index: 3 },
+      { char: 'T', target: 'entreecafe', spawnX: 12, spawnY: 1, index: 4 },
+    ],
+    npcs: [
       {
         id: 'infobalie',
         sprite: 'npc_receptionist',
-        x: 12,
-        y: 5,
-        name: 'Infobalie',
+        x: 10,
+        y: 7,
+        name: 'Receptionist Daniëlle',
         isInfobalie: true,
         isTrainer: false,
         dialog: [],
@@ -291,7 +329,7 @@ const MAPS = {
     npcs: [
       {
         id: 'trainer_consultant',
-        sprite: 'npc_consultant',
+        sprite: 'npc_consultant_f',
         x: 2,
         y: 4,
         name: 'Senior Consultant Sophie',
@@ -398,7 +436,7 @@ const MAPS = {
       },
       {
         id: 'trainer_opleiding_2',
-        sprite: 'npc_trainer',
+        sprite: 'npc_trainer_f',
         x: 13,
         y: 15,
         name: 'Cursusleider Manouk',
@@ -480,7 +518,7 @@ const MAPS = {
       },
       {
         id: 'restaurant_npc',
-        sprite: 'npc_marketing',
+        sprite: 'npc_marketing_f',
         x: 15,
         y: 15,
         name: 'Collega Britt',
@@ -699,19 +737,19 @@ const MAPS = {
     tiles: [
       '#########################',
       '#...........T...........#',
-      '#..XX..XX..XX..XX..XX...#',
+      '#..XZ..XZ..XZ..XZ..XZ...#',
       '#EEEEEEEEEEEEEEEEEEEEE..#',
-      '#..XX..XX..XX..XX..XX...#',
+      '#..XZ..XZ..XZ..XZ..XZ...#',
       '#EEEEEEEEEEEEEEEEEEEEE..#',
-      '#..XX..XX..XX..XX..XX...#',
-      '#EEEEEEEEEEEEEEEEEEEEE..#',
-      '#.......................#',
-      '#..XX..XX..XX..XX..XX...#',
-      '#EEEEEEEEEEEEEEEEEEEEE..#',
-      '#..XX..XX..XX..XX..XX...#',
+      '#..XZ..XZ..XZ..XZ..XZ...#',
       '#EEEEEEEEEEEEEEEEEEEEE..#',
       '#.......................#',
-      '#..XX..XX..XX..XX..XX...#',
+      '#..XZ..XZ..XZ..XZ..XZ...#',
+      '#EEEEEEEEEEEEEEEEEEEEE..#',
+      '#..XZ..XZ..XZ..XZ..XZ...#',
+      '#EEEEEEEEEEEEEEEEEEEEE..#',
+      '#.......................#',
+      '#..XZ..XZ..XZ..XZ..XZ...#',
       '#EEEEEEEEEEEEEEEEEEEEE..#',
       '#.......................#',
       '#.......................#',
@@ -858,9 +896,14 @@ export function parseMap(mapData) {
         case 'R': tileKey = 'tile_counter'; isWalkable = false; break;
         case 'L': tileKey = 'tile_laadpaal'; isWalkable = false; break;
         case 'S': tileKey = 'tile_solar_panel'; isWalkable = false; break;
-        case 'X': tileKey = 'tile_car'; isWalkable = false; break;
+        case 'X': tileKey = 'tile_car_left'; isWalkable = false; break;
+        case 'Z': tileKey = 'tile_car_right'; isWalkable = false; break;
         case 'V': tileKey = 'tile_piano'; isWalkable = false; break;
         case 'F': tileKey = 'tile_piano_keys'; isWalkable = false; break;
+        case 'B': tileKey = 'tile_bar'; isWalkable = false; break;
+        case 'Q': tileKey = 'tile_koffie'; isWalkable = false; break;
+        case 'I': tileKey = 'tile_cake'; isWalkable = false; break;
+        case 'J': tileKey = 'tile_table'; isWalkable = false; break;
         case 'D': tileKey = mapData.floorTile; isWalkable = true; break;
         case 'N': tileKey = mapData.floorTile; isWalkable = true; break;
         case 'H': tileKey = mapData.floorTile; isWalkable = true; break;

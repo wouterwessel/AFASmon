@@ -51,6 +51,7 @@ export const SCENES = {
 export const ZONES = {
   PARKEERPLAATS: 'parkeerplaats',
   BUITENTUIN: 'buitentuin',
+  ENTREECAFE: 'entreecafe',
   ATRIUM: 'atrium',
   KANTOOR: 'kantoor',
   OVERLEGRUIMTES: 'overlegruimtes',

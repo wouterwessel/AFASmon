@@ -1,5 +1,4 @@
-{
-  "automatiseer": {
+{\n  "kopstoot": {\n    "name": "Kopstoot",\n    "type": "NEUTRAAL",\n    "power": 50,\n    "accuracy": 100,\n    "pp": 30,\n    "description": "Een simpele maar effectieve aanval. Altijd even sterk, ongeacht het type."\n  },\n  "automatiseer": {
     "name": "Automatiseer",
     "type": "DOEN",
     "power": 50,

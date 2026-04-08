@@ -161,8 +161,8 @@ export class BattleSystem {
   calculateXpGain(defeatedMon, isWild) {
     const base = defeatedMon.xpYield;
     const level = defeatedMon.level;
-    const wildBonus = isWild ? 1.0 : 1.5;
-    return Math.floor((base * level / 5) * wildBonus);
+    const wildBonus = isWild ? 1.5 : 2.5;
+    return Math.floor((base * level / 3) * wildBonus);
   }
 
   selectEnemyMove(enemyMon, playerMon) {

@@ -53,7 +53,7 @@ const MAPS = {
       '#########################',
     ],
     transitions: [
-      { char: 'T', target: 'buitentuin', spawnX: 12, spawnY: 1 },
+      { char: 'T', target: 'atrium', spawnX: 11, spawnY: 0 },
     ],
     npcs: [],
   },
@@ -122,9 +122,9 @@ const MAPS = {
       '########################',
     ],
     transitions: [
-      { char: 'T', target: 'buitentuin', spawnX: 12, spawnY: 16, index: 0 },
-      { char: 'T', target: 'kantoor', spawnX: 1, spawnY: 9, index: 1 },
-      { char: 'T', target: 'restaurant', spawnX: 23, spawnY: 9, index: 2 },
+      { char: 'T', target: 'parkeerplaats', spawnX: 11, spawnY: 14, index: 0 },
+      { char: 'T', target: 'kantoor', spawnX: 0, spawnY: 8, index: 1 },
+      { char: 'T', target: 'restaurant', spawnX: 0, spawnY: 8, index: 2 },
       { char: 'T', target: 'collegezalen', spawnX: 12, spawnY: 1, index: 3 },
       { char: 'T', target: 'theater', spawnX: 12, spawnY: 1, index: 4 },
     ],
@@ -189,8 +189,8 @@ const MAPS = {
       '#########################',
     ],
     transitions: [
-      { char: 'T', target: 'atrium', spawnX: 22, spawnY: 7, index: 0 },
-      { char: 'T', target: 'overlegruimtes', spawnX: 1, spawnY: 9, index: 1 },
+      { char: 'T', target: 'atrium', spawnX: 0, spawnY: 7, index: 0 },
+      { char: 'T', target: 'overlegruimtes', spawnX: 0, spawnY: 8, index: 1 },
     ],
     npcs: [
       {
@@ -268,8 +268,8 @@ const MAPS = {
       '#########################',
     ],
     transitions: [
-      { char: 'T', target: 'kantoor', spawnX: 22, spawnY: 8, index: 0 },
-      { char: 'T', target: 'sportruimtes', spawnX: 1, spawnY: 9, index: 1 },
+      { char: 'T', target: 'kantoor', spawnX: 24, spawnY: 8, index: 0 },
+      { char: 'T', target: 'sportruimtes', spawnX: 0, spawnY: 8, index: 1 },
       { char: 'T', target: 'directiekamer', spawnX: 12, spawnY: 14, index: 2 },
     ],
     npcs: [
@@ -348,7 +348,7 @@ const MAPS = {
       '#########################',
     ],
     transitions: [
-      { char: 'T', target: 'atrium', spawnX: 12, spawnY: 16, index: 0 },
+      { char: 'T', target: 'atrium', spawnX: 0, spawnY: 12, index: 0 },
     ],
     npcs: [
       {
@@ -424,7 +424,7 @@ const MAPS = {
       '#########################',
     ],
     transitions: [
-      { char: 'T', target: 'atrium', spawnX: 1, spawnY: 12, index: 0 },
+      { char: 'T', target: 'atrium', spawnX: 23, spawnY: 7, index: 0 },
     ],
     npcs: [
       {
@@ -498,7 +498,7 @@ const MAPS = {
       '#########################',
     ],
     transitions: [
-      { char: 'T', target: 'overlegruimtes', spawnX: 22, spawnY: 8, index: 0 },
+      { char: 'T', target: 'overlegruimtes', spawnX: 24, spawnY: 8, index: 0 },
     ],
     npcs: [
       {
@@ -564,7 +564,7 @@ const MAPS = {
       '#########################',
     ],
     transitions: [
-      { char: 'T', target: 'atrium', spawnX: 1, spawnY: 7, index: 0 },
+      { char: 'T', target: 'atrium', spawnX: 0, spawnY: 7, index: 0 },
     ],
     npcs: [
       {
@@ -629,7 +629,7 @@ const MAPS = {
       '#########################',
     ],
     transitions: [
-      { char: 'T', target: 'atrium', spawnX: 12, spawnY: 13, index: 0 },
+      { char: 'T', target: 'atrium', spawnX: 23, spawnY: 12, index: 0 },
       { char: 'T', target: 'parkeergarage', spawnX: 12, spawnY: 1, index: 1 },
     ],
     npcs: [
@@ -686,7 +686,7 @@ const MAPS = {
       '#########################',
     ],
     transitions: [
-      { char: 'T', target: 'theater', spawnX: 12, spawnY: 16, index: 0 },
+      { char: 'T', target: 'theater', spawnX: 11, spawnY: 17, index: 0 },
     ],
     npcs: [],
   },

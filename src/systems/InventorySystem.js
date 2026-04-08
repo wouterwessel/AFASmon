@@ -9,7 +9,7 @@ export class InventorySystem {
       koffie: 3,
     };
     this.defeatedTrainers = [];
-    this.unlockedZones = ['parkeerplaats', 'buitentuin', 'atrium', 'kantoor', 'restaurant', 'collegezalen'];
+    this.unlockedZones = ['parkeerplaats', 'atrium', 'kantoor', 'restaurant', 'collegezalen'];
     this.badges = [];
     this.currentZone = 'parkeerplaats';
     this.storyFlags = {};

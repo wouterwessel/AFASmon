@@ -221,10 +221,7 @@ export class WorldScene extends Phaser.Scene {
     const mapWidth = this.mapData.width * TILE_SIZE;
     const mapHeight = (this.mapData.tiles?.length || this.mapData.height) * TILE_SIZE;
     this.cameras.main.setBounds(0, 0, Math.max(mapWidth, GAME_WIDTH), Math.max(mapHeight, GAME_HEIGHT));
-    this.cameras.main.startFollow({
-      x: this.playerSprite.x,
-      y: this.playerSprite.y,
-    }, false, 0.1, 0.1);
+    this.cameras.main.startFollow(this.playerSprite, true, 0.15, 0.15);
 
     // Update zone label
     const zoneNames = {
@@ -314,11 +311,6 @@ export class WorldScene extends Phaser.Scene {
       x: newX * TILE_SIZE + TILE_SIZE / 2,
       y: newY * TILE_SIZE + TILE_SIZE / 2,
       duration: this.moveSpeed,
-      onUpdate: () => {
-        // Update camera follow target
-        this.cameras.main.scrollX = this.playerSprite.x - GAME_WIDTH / 2;
-        this.cameras.main.scrollY = this.playerSprite.y - GAME_HEIGHT / 2;
-      },
       onComplete: () => {
         this.isMoving = false;
         this.checkTile();

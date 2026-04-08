@@ -118,7 +118,7 @@ export class BattleScene extends Phaser.Scene {
     // Type badge
     const typeColors = {
       DOEN: 0xE53935, VERTROUWEN: 0x2196F3, GEK: 0xAB47BC,
-      FAMILIE: 0x66BB6A, LEGENDARY: 0xFFD700,
+      FAMILIE: 0x66BB6A, NEUTRAAL: 0x9E9E9E, LEGENDARY: 0xFFD700,
     };
     const badge = this.add.rectangle(10 + nameText.width + 10, 14, 0, 18,
       typeColors[mon.type] || 0x888888).setOrigin(0, 0.5);
@@ -264,7 +264,7 @@ export class BattleScene extends Phaser.Scene {
 
     const typeColors = {
       DOEN: 0xE53935, VERTROUWEN: 0x2196F3, GEK: 0xAB47BC,
-      FAMILIE: 0x66BB6A, LEGENDARY: 0xFFD700,
+      FAMILIE: 0x66BB6A, NEUTRAAL: 0x9E9E9E, LEGENDARY: 0xFFD700,
     };
 
     this.playerMon.moves.forEach((move, i) => {

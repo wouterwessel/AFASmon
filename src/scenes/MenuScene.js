@@ -9,6 +9,12 @@ export class MenuScene extends Phaser.Scene {
   create() {
     // Dark gradient background
     this.cameras.main.setBackgroundColor('#0a0a2e');
+
+    // Cleanup on scene shutdown
+    this.events.on('shutdown', () => {
+      this.tweens.killAll();
+      if (this.particles) { this.particles.forEach(p => p.destroy()); this.particles = null; }
+    });
     const bg = this.add.graphics();
     bg.fillGradientStyle(0x0a0a2e, 0x0a0a2e, 0x00396b, 0x00396b);
     bg.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
@@ -224,12 +230,17 @@ export class MenuScene extends Phaser.Scene {
   continueGame() {
     const saveData = localStorage.getItem('afasmon_save');
     if (saveData) {
-      const data = JSON.parse(saveData);
-      this.scene.start(SCENES.WORLD, {
-        newGame: false,
-        saveData: data,
-        currentZone: data.currentZone,
-      });
+      try {
+        const data = JSON.parse(saveData);
+        this.scene.start(SCENES.WORLD, {
+          newGame: false,
+          saveData: data,
+          currentZone: data.currentZone,
+        });
+      } catch (e) {
+        localStorage.removeItem('afasmon_save');
+        this.scene.start(SCENES.MENU);
+      }
     }
   }
 }

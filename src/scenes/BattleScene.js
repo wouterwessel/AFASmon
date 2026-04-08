@@ -45,8 +45,27 @@ export class BattleScene extends Phaser.Scene {
     this.battleSystem = new BattleSystem();
     this.dialogSystem = new DialogSystem(this);
 
+    // Cleanup on scene shutdown
+    this.events.on('shutdown', () => {
+      this.tweens.killAll();
+      this.clearMenuKeys();
+      if (this.dialogSystem) this.dialogSystem.hide();
+    });
+
     this.inventory = this.registry.get('inventory');
     this.playerMon = this.inventory.getFirstAlive();
+
+    if (!this.playerMon) {
+      // Safety: no alive team members — return to restaurant for healing
+      this.inventory.healTeam();
+      this.scene.start(SCENES.WORLD, {
+        newGame: false,
+        currentZone: 'restaurant',
+        spawnX: 5,
+        spawnY: 8,
+      });
+      return;
+    }
 
     if (!this.enemyMon && this.enemyTeam.length > 0) {
       this.enemyMon = this.enemyTeam[0];
@@ -783,6 +802,7 @@ export class BattleScene extends Phaser.Scene {
           }
 
           this.enemyMon.isWild = false;
+          this.enemyMon.resetBattleMods();
           if (this.inventory.addToTeam(this.enemyMon)) {
             catchMessages.push(`${this.enemyMon.name} is toegevoegd aan je team!`);
           } else {
@@ -847,6 +867,8 @@ export class BattleScene extends Phaser.Scene {
     const fleeChance = 0.5 + (this.playerMon.getEffectiveStat('speed') / this.enemyMon.getEffectiveStat('speed')) * 0.3;
 
     if (Math.random() < fleeChance) {
+      // Cancel wave battle chain on flee
+      this.isWaveBattle = false;
       this.showMessage('Je bent succesvol gevlucht!', () => {
         this.returnToWorld();
       });

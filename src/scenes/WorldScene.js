@@ -54,6 +54,9 @@ export class WorldScene extends Phaser.Scene {
     // Dialog system
     this.dialogSystem = new DialogSystem(this);
 
+    // Cleanup on scene shutdown
+    this.events.on('shutdown', this.cleanup, this);
+
     // Input
     this.cursors = this.input.keyboard.createCursorKeys();
     this.wasd = {
@@ -156,6 +159,9 @@ export class WorldScene extends Phaser.Scene {
   }
 
   loadZone(zoneName) {
+    // Kill all tweens before clearing objects (prevents tween-on-destroyed-object)
+    this.tweens.killAll();
+
     // Clear existing
     if (this.tileContainer) this.tileContainer.destroy();
     if (this.npcSprites) this.npcSprites.forEach(n => {
@@ -391,14 +397,15 @@ export class WorldScene extends Phaser.Scene {
   }
 
   updateQuestLabel() {
+    if (!this.questLabel) return;
     const quest = this.inventory.getCurrentQuest();
     this.questLabel.setText(`📋 ${quest.title}: ${quest.desc}`);
   }
 
   findWalkable(x, y) {
     if (this.isWalkable(x, y)) return { x, y };
-    // Search nearby
-    for (let r = 1; r < 5; r++) {
+    // Search nearby (max 10 radius to prevent infinite loop)
+    for (let r = 1; r < 10; r++) {
       for (let dy = -r; dy <= r; dy++) {
         for (let dx = -r; dx <= r; dx++) {
           if (this.isWalkable(x + dx, y + dy)) return { x: x + dx, y: y + dy };
@@ -851,11 +858,14 @@ export class WorldScene extends Phaser.Scene {
   }
 
   transitionToZone(zoneName, spawnX, spawnY) {
+    if (this.isTransitioning) return;
+    this.isTransitioning = true;
     this.cameras.main.fadeOut(300, 0, 0, 0);
     this.time.delayedCall(300, () => {
       this.spawnX = spawnX;
       this.spawnY = spawnY;
       this.loadZone(zoneName);
+      this.isTransitioning = false;
       this.cameras.main.fadeIn(300, 0, 0, 0);
     });
   }
@@ -1279,5 +1289,19 @@ export class WorldScene extends Phaser.Scene {
       this.updateHUD();
       this.updateQuestLabel();
     });
+  }
+
+  cleanup() {
+    this.tweens.killAll();
+    // Sprint timer
+    if (this.sprintTimerEvent) { this.sprintTimerEvent.remove(); this.sprintTimerEvent = null; }
+    if (this.sprintTimerLabel) { this.sprintTimerLabel.destroy(); this.sprintTimerLabel = null; }
+    this.sprintTimerActive = false;
+    // Quiz container
+    if (this.quizContainer) { this.quizContainer.destroy(); this.quizContainer = null; }
+    // Team menu
+    if (this.teamMenu) { this.teamMenu.destroy(); this.teamMenu = null; }
+    // Dialog system
+    if (this.dialogSystem) this.dialogSystem.hide();
   }
 }

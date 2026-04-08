@@ -123,19 +123,23 @@ export class InventorySystem {
   }
 
   static deserialize(data) {
-    const inv = new InventorySystem();
-    inv.team = data.team.map(d => AFASmon.deserialize(d));
-    inv.items = data.items;
-    inv.defeatedTrainers = data.defeatedTrainers;
-    inv.unlockedZones = data.unlockedZones;
-    inv.badges = data.badges;
-    inv.currentZone = data.currentZone;
-    inv.storyFlags = data.storyFlags || {};
-    inv.playerName = data.playerName || 'Speler';
-    inv.shirtColor = data.shirtColor ?? 0x00529C;
-    inv.hairColor = data.hairColor ?? 0x4A3728;
-    inv.skinColor = data.skinColor ?? 0xFFDDB0;
-    inv.gender = data.gender ?? 'male';
-    return inv;
+    try {
+      const inv = new InventorySystem();
+      inv.team = Array.isArray(data.team) ? data.team.map(d => AFASmon.deserialize(d)) : [];
+      inv.items = data.items || { contract: 5, koffie: 3 };
+      inv.defeatedTrainers = data.defeatedTrainers || [];
+      inv.unlockedZones = data.unlockedZones || ['parkeerplaats', 'entreecafe', 'atrium', 'kantoor', 'restaurant', 'collegezalen'];
+      inv.badges = data.badges || [];
+      inv.currentZone = data.currentZone || 'parkeerplaats';
+      inv.storyFlags = data.storyFlags || {};
+      inv.playerName = data.playerName || 'Speler';
+      inv.shirtColor = data.shirtColor ?? 0x00529C;
+      inv.hairColor = data.hairColor ?? 0x4A3728;
+      inv.skinColor = data.skinColor ?? 0xFFDDB0;
+      inv.gender = data.gender ?? 'male';
+      return inv;
+    } catch (e) {
+      return new InventorySystem();
+    }
   }
 }

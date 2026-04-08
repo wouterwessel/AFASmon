@@ -25,6 +25,14 @@ export class DialogSystem {
   }
 
   renderDialog(dialog) {
+    // Clean up previous listeners and timer
+    if (this.currentAdvanceFn) {
+      this.scene.input.off('pointerdown', this.currentAdvanceFn);
+      this.scene.input.keyboard.off('keydown-SPACE', this.currentAdvanceFn);
+      this.scene.input.keyboard.off('keydown-ENTER', this.currentAdvanceFn);
+      this.currentAdvanceFn = null;
+    }
+    if (this.typeTimer) { this.typeTimer.remove(); this.typeTimer = null; }
     if (this.container) this.container.destroy();
 
     const { scene } = this;
@@ -105,6 +113,7 @@ export class DialogSystem {
       }
     };
 
+    this.currentAdvanceFn = advance;
     scene.input.on('pointerdown', advance);
     scene.input.keyboard.on('keydown-SPACE', advance);
     scene.input.keyboard.on('keydown-ENTER', advance);
@@ -155,11 +164,17 @@ export class DialogSystem {
 
   hide() {
     this.isActive = false;
+    if (this.currentAdvanceFn) {
+      this.scene.input.off('pointerdown', this.currentAdvanceFn);
+      this.scene.input.keyboard.off('keydown-SPACE', this.currentAdvanceFn);
+      this.scene.input.keyboard.off('keydown-ENTER', this.currentAdvanceFn);
+      this.currentAdvanceFn = null;
+    }
     if (this.container) {
       this.container.destroy();
       this.container = null;
     }
-    if (this.typeTimer) this.typeTimer.remove();
+    if (this.typeTimer) { this.typeTimer.remove(); this.typeTimer = null; }
     if (this.currentCallback) this.currentCallback();
   }
 }

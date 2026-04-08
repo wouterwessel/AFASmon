@@ -88,10 +88,10 @@ export class BattleSystem {
     }
 
     // Apply effects
-    if (move.effect && Math.random() < (move.effect.chance || 1.0)) {
+    if (move.effect && Math.random() < Math.min(1.0, move.effect.chance || 1.0)) {
       switch (move.effect.type) {
         case 'buff':
-          attacker.battleMods[move.effect.stat] += move.effect.amount;
+          attacker.battleMods[move.effect.stat] = Math.min(6, attacker.battleMods[move.effect.stat] + move.effect.amount);
           results.push({
             type: 'stat_change',
             target: 'attacker',
@@ -102,7 +102,7 @@ export class BattleSystem {
           break;
 
         case 'debuff':
-          defender.battleMods[move.effect.stat] += move.effect.amount;
+          defender.battleMods[move.effect.stat] = Math.max(-6, defender.battleMods[move.effect.stat] + move.effect.amount);
           results.push({
             type: 'stat_change',
             target: 'defender',

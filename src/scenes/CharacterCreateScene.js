@@ -33,6 +33,11 @@ export class CharacterCreateScene extends Phaser.Scene {
   }
 
   create() {
+    // Cleanup on scene shutdown
+    this.events.on('shutdown', () => {
+      this.tweens.killAll();
+    });
+
     // Dark gradient background
     this.cameras.main.setBackgroundColor('#0a0a2e');
     const bg = this.add.graphics();

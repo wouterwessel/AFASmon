@@ -22,6 +22,11 @@ export class WorldScene extends Phaser.Scene {
     this.customHairColor = data.hairColor;
     this.customSkinColor = data.skinColor;
     this.customGender = data.gender;
+    // Wave battle continuation
+    this.pendingWaveBattle = data.isWaveBattle ? data.currentWave + 1 : 0;
+    // Quiz continuation
+    this.pendingQuiz = data.returnToQuiz || false;
+    this.pendingQuizState = data.quizState || null;
   }
 
   create() {
@@ -122,6 +127,32 @@ export class WorldScene extends Phaser.Scene {
         this.checkInteraction();
       }
     });
+
+    // Handle wave battle continuation
+    if (this.pendingWaveBattle > 0) {
+      this.time.delayedCall(500, () => {
+        this.startWaveBattle(this.pendingWaveBattle);
+        this.pendingWaveBattle = 0;
+      });
+    }
+
+    // Handle quiz continuation
+    if (this.pendingQuiz && this.pendingQuizState) {
+      this.time.delayedCall(500, () => {
+        this.quizIndex = this.pendingQuizState.index;
+        this.quizScore = this.pendingQuizState.score;
+        this.quizQuestions = [
+          { q: 'Waar staat AFAS voor?', options: ['Administratie, Financiën, Automatisering, Software', 'Automatische Financiële Administratie Software', 'AFAS Flexibele Applicatie Suite', 'Alle Functies Automatisch Systeem'], correct: 1 },
+          { q: 'Welk type is sterk tegen Gek?', options: ['Doen', 'Vertrouwen', 'Familie', 'Gek'], correct: 1 },
+          { q: 'Hoeveel zonnepanelen heeft het AFAS Clubhuis?', options: ['500', '750', '1000+', '250'], correct: 2 },
+          { q: 'Wat doet een koffieautomaat in AFASmon?', options: ['Geeft XP', 'Heelt je team', 'Vangt AFASmon', 'Ontgrendelt zones'], correct: 1 },
+          { q: 'Wie is de CEO van AFAS Software?', options: ['Mohamed', 'Martijn', 'Bas van der Veldt', 'Lars'], correct: 2 },
+        ];
+        this.showQuizQuestion();
+        this.pendingQuiz = false;
+        this.pendingQuizState = null;
+      });
+    }
   }
 
   loadZone(zoneName) {
@@ -137,12 +168,18 @@ export class WorldScene extends Phaser.Scene {
     this.currentZone = zoneName;
     this.inventory.currentZone = zoneName;
 
+    // Add Innovaxx to dakterras encounters if cloud_deployed
+    if (zoneName === 'dakterras' && this.inventory.getFlag('cloud_deployed') &&
+        !this.mapData.encounterMons.includes('innovaxx')) {
+      this.mapData.encounterMons.push('innovaxx');
+    }
+
     // Object tiles that are rendered on top of the floor tile
     const overlayTiles = new Set([
       'tile_plant', 'tile_cake', 'tile_table', 'tile_chair',
       'tile_chair_up', 'tile_chair_left', 'tile_chair_right',
       'tile_laadpaal', 'tile_art_quinn', 'tile_desk', 'tile_koffie',
-      'tile_car_left', 'tile_car_right',
+      'tile_car_left', 'tile_car_right', 'tile_server_rack',
     ]);
 
     // Helper: get tile at position (for chair auto-rotation)
@@ -200,6 +237,7 @@ export class WorldScene extends Phaser.Scene {
             tile_car_left: 0x78909C,
             tile_car_right: 0x78909C,
             tile_door: 0xF57C00,
+            tile_server_rack: 0x1A237E,
           };
           const color = colors[tileKey] || 0x888888;
           const rect = this.add.rectangle(
@@ -437,6 +475,13 @@ export class WorldScene extends Phaser.Scene {
     );
     if (transition) {
       if (this.inventory.isZoneUnlocked(transition.target)) {
+        // Directiekamer requires garage_cleared in addition to zone unlock
+        if (transition.target === 'directiekamer' && !this.inventory.getFlag('garage_cleared')) {
+          this.dialogSystem.show([
+            { speaker: 'Systeem', text: 'De server-migratie is nog niet voltooid! Vind alle 3 Encryptiesleutels in de Parkeergarage.' },
+          ]);
+          return;
+        }
         this.transitionToZone(transition.target, transition.spawnX, transition.spawnY);
       } else {
         this.dialogSystem.show([
@@ -512,6 +557,20 @@ export class WorldScene extends Phaser.Scene {
       }
     }
 
+    // Check for server rack tile (parkeergarage keys)
+    if (this.currentZone === 'parkeergarage') {
+      for (const { dx, dy } of dirs) {
+        const checkX = this.playerGridX + dx;
+        const checkY = this.playerGridY + dy;
+        if (checkY >= 0 && checkY < this.parsedMap.tiles.length &&
+            checkX >= 0 && checkX < this.parsedMap.tiles[checkY].length &&
+            this.parsedMap.tiles[checkY][checkX] === 'tile_server_rack') {
+          this.interactServerRack(checkX, checkY);
+          return;
+        }
+      }
+    }
+
     // Easter egg: interact 3x with leftmost cake in entreecafe (3,9)
     if (this.currentZone === 'entreecafe') {
       for (const { dx, dy } of dirs) {
@@ -569,6 +628,58 @@ export class WorldScene extends Phaser.Scene {
         { speaker: firstName, text: quest.desc },
       ];
       this.dialogSystem.show(hints);
+      return;
+    }
+
+    // Scrum Master — Sprint timer
+    if (npc.isSprintMaster) {
+      if (this.inventory.getFlag('sprint_master')) {
+        this.dialogSystem.show([
+          { speaker: 'Femke', text: 'Je hebt de Sprint al gehaald, {name}! Sterk gedaan. 💪' },
+        ]);
+        return;
+      }
+      this.dialogSystem.show(npc.dialog, () => {
+        this.startSprintTimer();
+      });
+      return;
+    }
+
+    // Sprint Finish
+    if (npc.isSprintFinish) {
+      if (this.sprintTimerActive) {
+        this.completeSprintTimer();
+        return;
+      }
+      this.dialogSystem.show(npc.dialog);
+      return;
+    }
+
+    // QA Engineer — Quiz
+    if (npc.isQuizMaster) {
+      if (this.inventory.getFlag('quiz_done')) {
+        this.dialogSystem.show([
+          { speaker: 'Priya', text: 'Je hebt de quiz al gehaald, {name}! Alle bugs gevonden. 🐛✅' },
+        ]);
+        return;
+      }
+      this.dialogSystem.show(npc.dialog, () => {
+        this.startQuiz();
+      });
+      return;
+    }
+
+    // Cloud Architect — Wave battles
+    if (npc.isWaveMaster) {
+      if (this.inventory.getFlag('cloud_deployed')) {
+        this.dialogSystem.show([
+          { speaker: 'Yara', text: 'Je hebt de Cloud Deployment al voltooid! Loop door de groene zones — misschien vind je iets legendarisch... ⚡' },
+        ]);
+        return;
+      }
+      this.dialogSystem.show(npc.dialog, () => {
+        this.startWaveBattle(1);
+      });
       return;
     }
 
@@ -900,6 +1011,273 @@ export class WorldScene extends Phaser.Scene {
         g.generateTexture(key, TILE_SIZE, TILE_SIZE);
         g.destroy();
       }
+    });
+  }
+
+  // === PARKEERGARAGE: Server Rack Key Collection ===
+  interactServerRack(rx, ry) {
+    // Determine which key this rack holds based on position
+    const rackPositions = [
+      { x: 11, y: 8, key: 'garage_key_1', name: 'Encryptiesleutel Alpha' },
+      { x: 11, y: 11, key: 'garage_key_2', name: 'Encryptiesleutel Bravo' },
+      { x: 11, y: 15, key: 'garage_key_3', name: 'Encryptiesleutel Charlie' },
+    ];
+
+    const rack = rackPositions.find(r => r.x === rx && r.y === ry);
+    if (!rack) {
+      this.dialogSystem.show([
+        { speaker: 'Systeem', text: 'Een server-rack. De LEDs knipperen rustig. Hier zit geen sleutel.' },
+      ]);
+      return;
+    }
+
+    if (this.inventory.getFlag(rack.key)) {
+      this.dialogSystem.show([
+        { speaker: 'Systeem', text: `Je hebt ${rack.name} hier al gevonden.` },
+      ]);
+      return;
+    }
+
+    this.inventory.setFlag(rack.key);
+    const keysFound = (this.inventory.getFlag('garage_key_1') ? 1 : 0) +
+                      (this.inventory.getFlag('garage_key_2') ? 1 : 0) +
+                      (this.inventory.getFlag('garage_key_3') ? 1 : 0);
+
+    const messages = [
+      { speaker: 'Systeem', text: `${rack.name} gevonden! 🔑 (${keysFound}/3)` },
+    ];
+
+    if (this.inventory.hasAllGarageKeys()) {
+      this.inventory.setFlag('garage_cleared');
+      messages.push({ speaker: 'Systeem', text: 'Alle 3 Encryptiesleutels verzameld! Server-migratie voltooid! 🎉' });
+      messages.push({ speaker: 'Systeem', text: 'De Directiekamer is nu ook écht bereikbaar. Ga CEO Bas uitdagen!' });
+    }
+
+    this.dialogSystem.show(messages, () => {
+      this.saveGame();
+      this.updateHUD();
+      this.updateQuestLabel();
+    });
+  }
+
+  // === SPORTRUIMTES: Sprint Timer ===
+  startSprintTimer() {
+    this.sprintTimerActive = true;
+    this.sprintTimeLeft = 30;
+
+    this.sprintTimerLabel = this.add.text(GAME_WIDTH / 2, 70, '', {
+      fontFamily: 'Arial Black',
+      fontSize: '24px',
+      color: '#FFD700',
+      backgroundColor: '#000000',
+      padding: { x: 12, y: 6 },
+    }).setOrigin(0.5).setDepth(600).setScrollFactor(0);
+
+    this.sprintTimerEvent = this.time.addEvent({
+      delay: 1000,
+      repeat: 29,
+      callback: () => {
+        this.sprintTimeLeft--;
+        if (this.sprintTimerLabel) {
+          this.sprintTimerLabel.setText(`⏱️ Sprint: ${this.sprintTimeLeft}s`);
+          if (this.sprintTimeLeft <= 5) {
+            this.sprintTimerLabel.setColor('#E53935');
+          }
+        }
+        if (this.sprintTimeLeft <= 0) {
+          this.failSprintTimer();
+        }
+      },
+    });
+
+    this.sprintTimerLabel.setText(`⏱️ Sprint: ${this.sprintTimeLeft}s`);
+
+    this.dialogSystem.show([
+      { speaker: 'Systeem', text: 'Sprint gestart! Loop naar de Finish Coordinator aan de zuidkant! 🏃' },
+    ]);
+  }
+
+  completeSprintTimer() {
+    if (!this.sprintTimerActive) return;
+    this.sprintTimerActive = false;
+    if (this.sprintTimerEvent) this.sprintTimerEvent.remove();
+    if (this.sprintTimerLabel) { this.sprintTimerLabel.destroy(); this.sprintTimerLabel = null; }
+
+    const timeUsed = 30 - this.sprintTimeLeft;
+    this.inventory.setFlag('sprint_master');
+    this.inventory.addItem('koffie', 5);
+    this.inventory.addItem('contract', 3);
+
+    this.dialogSystem.show([
+      { speaker: 'Systeem', text: `Sprint voltooid in ${timeUsed} seconden! 🏆` },
+      { speaker: 'Coordinator', text: 'Wauw, je bent er! Hier zijn je beloningen: 5 Koffie en 3 Contracten!' },
+      { speaker: 'Coordinator', text: 'Je bent nu een echte Sprint Master!' },
+    ], () => {
+      this.saveGame();
+      this.updateHUD();
+    });
+  }
+
+  failSprintTimer() {
+    this.sprintTimerActive = false;
+    if (this.sprintTimerEvent) this.sprintTimerEvent.remove();
+    if (this.sprintTimerLabel) { this.sprintTimerLabel.destroy(); this.sprintTimerLabel = null; }
+
+    this.dialogSystem.show([
+      { speaker: 'Systeem', text: 'Tijd is op! De Sprint is mislukt. ⏰' },
+      { speaker: 'Systeem', text: 'Praat opnieuw met Femke om het nog een keer te proberen.' },
+    ]);
+  }
+
+  // === STUDIOS: Bug Hunting Quiz ===
+  startQuiz() {
+    this.quizQuestions = [
+      { q: 'Waar staat AFAS voor?', options: ['Administratie, Financiën, Automatisering, Software', 'Automatische Financiële Administratie Software', 'AFAS Flexibele Applicatie Suite', 'Alle Functies Automatisch Systeem'], correct: 1 },
+      { q: 'Welk type is sterk tegen Gek?', options: ['Doen', 'Vertrouwen', 'Familie', 'Gek'], correct: 1 },
+      { q: 'Hoeveel zonnepanelen heeft het AFAS Clubhuis?', options: ['500', '750', '1000+', '250'], correct: 2 },
+      { q: 'Wat doet een koffieautomaat in AFASmon?', options: ['Geeft XP', 'Heelt je team', 'Vangt AFASmon', 'Ontgrendelt zones'], correct: 1 },
+      { q: 'Wie is de CEO van AFAS Software?', options: ['Mohamed', 'Martijn', 'Bas van der Veldt', 'Lars'], correct: 2 },
+    ];
+    this.quizScore = 0;
+    this.quizIndex = 0;
+    this.showQuizQuestion();
+  }
+
+  showQuizQuestion() {
+    if (this.quizIndex >= this.quizQuestions.length) {
+      this.finishQuiz();
+      return;
+    }
+
+    const q = this.quizQuestions[this.quizIndex];
+    const container = this.add.container(0, 0).setDepth(2000).setScrollFactor(0);
+    this.quizContainer = container;
+
+    container.add(this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.85));
+
+    container.add(this.add.text(GAME_WIDTH / 2, 40, `Bug Hunting Quiz (${this.quizIndex + 1}/5)`, {
+      fontFamily: 'Arial Black', fontSize: '22px', color: '#F57C00',
+    }).setOrigin(0.5));
+
+    container.add(this.add.text(GAME_WIDTH / 2, 100, q.q, {
+      fontFamily: 'Arial', fontSize: '18px', color: '#ffffff',
+      wordWrap: { width: 600 }, align: 'center',
+    }).setOrigin(0.5));
+
+    q.options.forEach((opt, i) => {
+      const y = 180 + i * 70;
+      const btn = this.add.rectangle(GAME_WIDTH / 2, y, 500, 50, 0x1a1a4e, 0.9)
+        .setStrokeStyle(2, COLORS.PRIMARY)
+        .setInteractive({ useHandCursor: true });
+      container.add(btn);
+
+      container.add(this.add.text(GAME_WIDTH / 2, y, `${String.fromCharCode(65 + i)}. ${opt}`, {
+        fontFamily: 'Arial', fontSize: '14px', color: '#ffffff',
+        wordWrap: { width: 460 },
+      }).setOrigin(0.5));
+
+      btn.on('pointerover', () => btn.setStrokeStyle(3, COLORS.SECONDARY));
+      btn.on('pointerout', () => btn.setStrokeStyle(2, COLORS.PRIMARY));
+      btn.on('pointerdown', () => {
+        container.destroy();
+        this.quizContainer = null;
+        if (i === q.correct) {
+          this.quizScore++;
+          this.quizIndex++;
+          this.dialogSystem.show([
+            { speaker: 'Priya', text: 'Correct! Geen bug dit keer! ✅' },
+          ], () => this.showQuizQuestion());
+        } else {
+          this.quizIndex++;
+          this.dialogSystem.show([
+            { speaker: 'Priya', text: 'Fout! Dat is een bug! Een wilde Workflox valt aan! 🐛' },
+          ], () => {
+            const wildMon = new AFASmon('workflox', 11, { isWild: true });
+            this.cameras.main.flash(300, 0, 0, 0);
+            this.time.delayedCall(300, () => {
+              this.scene.start(SCENES.BATTLE, {
+                type: 'wild',
+                enemy: wildMon,
+                zone: this.currentZone,
+                playerGridX: this.playerGridX,
+                playerGridY: this.playerGridY,
+                returnToQuiz: true,
+                quizState: { index: this.quizIndex, score: this.quizScore },
+              });
+            });
+          });
+        }
+      });
+    });
+  }
+
+  finishQuiz() {
+    this.inventory.setFlag('quiz_done');
+    const messages = [
+      { speaker: 'Priya', text: `Quiz klaar! Score: ${this.quizScore}/5 correct.` },
+    ];
+    if (this.quizScore >= 3) {
+      this.inventory.addItem('contract', 5);
+      this.inventory.addItem('koffie', 3);
+      messages.push({ speaker: 'Priya', text: 'Goed gedaan! Hier zijn 5 Contracten en 3 Koffie als beloning!' });
+    } else {
+      this.inventory.addItem('koffie', 2);
+      messages.push({ speaker: 'Priya', text: 'Niet slecht, maar er zijn nog wat bugs over. Hier zijn 2 Koffie.' });
+    }
+    this.dialogSystem.show(messages, () => {
+      this.saveGame();
+      this.updateHUD();
+    });
+  }
+
+  // === DAKTERRAS: Wave Battle Challenge ===
+  startWaveBattle(wave) {
+    if (wave > 3) {
+      this.completeWaveChallenge();
+      return;
+    }
+
+    const waveMonsters = [
+      { species: 'profitron', level: 13 + wave },
+      { species: 'workflox', level: 13 + wave },
+      { species: 'relatiox', level: 14 + wave },
+    ];
+    const enemy = waveMonsters[wave - 1];
+    const wildMon = new AFASmon(enemy.species, enemy.level, { isWild: true });
+
+    this.dialogSystem.show([
+      { speaker: 'Systeem', text: `Wave ${wave}/3! Een wilde ${wildMon.name} verschijnt! ⚡` },
+    ], () => {
+      this.cameras.main.flash(300, 0, 0, 0);
+      this.time.delayedCall(300, () => {
+        this.scene.start(SCENES.BATTLE, {
+          type: 'wild',
+          enemy: wildMon,
+          zone: this.currentZone,
+          playerGridX: this.playerGridX,
+          playerGridY: this.playerGridY,
+          isWaveBattle: true,
+          currentWave: wave,
+        });
+      });
+    });
+  }
+
+  completeWaveChallenge() {
+    this.inventory.setFlag('cloud_deployed');
+    this.inventory.addItem('contract', 5);
+    this.inventory.addItem('koffie', 5);
+
+    this.dialogSystem.show([
+      { speaker: 'Yara', text: 'Cloud Deployment voltooid! Alle 3 waves overleefd! ☁️🎉' },
+      { speaker: 'Yara', text: 'Hier zijn 5 Contracten en 5 Koffie. En er is iets veranderd op het dakterras...' },
+      { speaker: 'Systeem', text: 'Innovaxx kan nu verschijnen als wilde encounter op het Dakterras! ⚡' },
+    ], () => {
+      // Add Innovaxx to dakterras encounter pool
+      this.mapData.encounterMons.push('innovaxx');
+      this.saveGame();
+      this.updateHUD();
+      this.updateQuestLabel();
     });
   }
 }

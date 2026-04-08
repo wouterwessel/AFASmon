@@ -96,8 +96,13 @@ export class InventorySystem {
     if (!this.isTrainerDefeated('trainer_support')) return { title: 'Support nodig?', desc: 'Versla Bertine in de Overlegruimtes.' };
     if (!this.isTrainerDefeated('trainer_opleiding')) return { title: 'Terug naar school', desc: 'Versla Herman in de Collegezalen. (Zuid vanuit het Atrium)' };
     if (!this.isTrainerDefeated('theater_boss')) return { title: 'Showtime!', desc: 'Versla Mohamed in het AFAS Theater.' };
+    if (!this.getFlag('garage_cleared')) return { title: 'Server Migratie', desc: 'Vind alle 3 Encryptiesleutels in de Parkeergarage!' };
     if (!this.isTrainerDefeated('ceo_boss')) return { title: 'De CEO wacht', desc: 'Ga naar de Directiekamer en versla Bas van der Veldt!' };
     return { title: 'Klaar!', desc: 'Je hebt het Clubhuis veroverd! Verken vrij rond.' };
+  }
+
+  hasAllGarageKeys() {
+    return this.getFlag('garage_key_1') && this.getFlag('garage_key_2') && this.getFlag('garage_key_3');
   }
 
   serialize() {

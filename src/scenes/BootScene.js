@@ -701,6 +701,26 @@ export class BootScene extends Phaser.Scene {
       g.fillRect(4, S - 7, 3, 3);
       g.fillRect(S - 7, S - 7, 3, 3);
     });
+    makeTile('server_rack', (g) => {
+      // Server rack body
+      g.fillStyle(0x1A237E); g.fillRect(2, 0, S - 4, S);
+      // Front panel
+      g.fillStyle(0x283593); g.fillRect(4, 2, S - 8, S - 4);
+      // LED lights
+      g.fillStyle(0x4CAF50); g.fillRect(6, 4, 3, 2);
+      g.fillStyle(0x4CAF50); g.fillRect(6, 10, 3, 2);
+      g.fillStyle(0xFFC107); g.fillRect(6, 16, 3, 2);
+      // Drive bays
+      g.fillStyle(0x0D47A1);
+      g.fillRect(12, 3, 14, 5);
+      g.fillRect(12, 10, 14, 5);
+      g.fillRect(12, 17, 14, 5);
+      // Ventilation
+      g.lineStyle(1, 0x1A237E, 0.5);
+      g.lineBetween(12, 24, 26, 24);
+      g.lineBetween(12, 26, 26, 26);
+      g.lineBetween(12, 28, 26, 28);
+    });
   }
 
   generateItemSprites() {

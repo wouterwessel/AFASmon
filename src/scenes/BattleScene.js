@@ -33,6 +33,12 @@ export class BattleScene extends Phaser.Scene {
     this.returnX = data.playerGridX;
     this.returnY = data.playerGridY;
     this.enemyIndex = 0;
+    // Wave battle support
+    this.isWaveBattle = data.isWaveBattle || false;
+    this.currentWave = data.currentWave || 0;
+    // Quiz support
+    this.returnToQuiz = data.returnToQuiz || false;
+    this.quizState = data.quizState || null;
   }
 
   create() {
@@ -914,6 +920,12 @@ export class BattleScene extends Phaser.Scene {
       currentZone: this.returnZone,
       spawnX: this.returnX,
       spawnY: this.returnY,
+      // Wave battle continuation
+      isWaveBattle: this.isWaveBattle,
+      currentWave: this.currentWave,
+      // Quiz continuation
+      returnToQuiz: this.returnToQuiz,
+      quizState: this.quizState,
     });
   }
 

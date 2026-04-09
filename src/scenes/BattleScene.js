@@ -90,28 +90,30 @@ export class BattleScene extends Phaser.Scene {
       bg.fillRect(0, 300, GAME_WIDTH, 300);
     }
 
-    // Platforms
+    // Platforms — start off-screen for slide-in
     if (this.textures.exists('platform')) {
-      this.add.image(220, 350, 'platform').setScale(1.5);
-      this.add.image(580, 220, 'platform').setScale(1.2);
+      this.playerPlatform = this.add.image(-100, 350, 'platform').setScale(1.5);
+      this.enemyPlatform = this.add.image(GAME_WIDTH + 100, 220, 'platform').setScale(1.2);
     } else {
-      this.add.ellipse(220, 355, 180, 40, 0x6D4C41);
-      this.add.ellipse(580, 225, 150, 30, 0x6D4C41);
+      this.playerPlatform = this.add.ellipse(-100, 355, 180, 40, 0x6D4C41);
+      this.enemyPlatform = this.add.ellipse(GAME_WIDTH + 100, 225, 150, 30, 0x6D4C41);
     }
 
-    // Player AFASmon sprite
+    // Player AFASmon sprite — start off-screen left
     const pSpriteKey = `${this.playerMon.spriteKey}_battle`;
-    this.playerSprite = this.add.image(220, 300, pSpriteKey).setScale(1.5);
+    this.playerSprite = this.add.image(-100, 300, pSpriteKey).setScale(1.5);
 
-    // Enemy AFASmon sprite
+    // Enemy AFASmon sprite — start off-screen right
     const eSpriteKey = `${this.enemyMon.spriteKey}_battle`;
-    this.enemySprite = this.add.image(580, 170, eSpriteKey).setScale(1.2);
+    this.enemySprite = this.add.image(GAME_WIDTH + 100, 170, eSpriteKey).setScale(1.2);
 
-    // Player info box (top-right area)
+    // Player info box — start invisible
     this.createInfoBox(460, 360, this.playerMon, 'player');
+    this.pInfoContainer.setAlpha(0);
 
-    // Enemy info box (top-left area)
+    // Enemy info box — start invisible
     this.createInfoBox(50, 30, this.enemyMon, 'enemy');
+    this.eInfoContainer.setAlpha(0);
 
     // Action menu container (bottom)
     this.actionContainer = this.add.container(0, 440).setDepth(100);
@@ -119,6 +121,10 @@ export class BattleScene extends Phaser.Scene {
 
     // Message box
     this.messageBox = this.add.container(0, 0).setDepth(200);
+
+    // White flash overlay (on top of everything)
+    this.flashOverlay = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0xFFFFFF)
+      .setDepth(300).setAlpha(1);
   }
 
   createInfoBox(x, y, mon, owner) {
@@ -387,24 +393,87 @@ export class BattleScene extends Phaser.Scene {
 
   showIntro() {
     const isWild = this.battleType === 'wild';
-    const text = isWild
-      ? `Een wilde ${this.enemyMon.name} verschijnt!`
-      : `${this.trainerName} daagt je uit!`;
 
-    this.showMessage(text, () => {
-      if (!isWild) {
-        this.showMessage(`${this.trainerName} stuurt ${this.enemyMon.name} het veld in!`, () => {
-          this.showMessage(`Ga, ${this.playerMon.name}!`, () => {
-            this.state = STATES.PLAYER_TURN;
-            this.createActionMenu();
+    // Phase 1: Flash fades out while enemy slides in from right
+    this.tweens.add({
+      targets: this.flashOverlay,
+      alpha: 0,
+      duration: 400,
+      ease: 'Power2',
+      onComplete: () => {
+        if (this.flashOverlay) this.flashOverlay.destroy();
+        this.flashOverlay = null;
+      },
+    });
+
+    // Enemy + platform slide in from right
+    this.tweens.add({
+      targets: [this.enemySprite],
+      x: 580,
+      duration: 700,
+      ease: 'Power2',
+      delay: 200,
+    });
+    this.tweens.add({
+      targets: [this.enemyPlatform],
+      x: this.textures.exists('platform') ? 580 : 580,
+      duration: 700,
+      ease: 'Power2',
+      delay: 200,
+    });
+    // Enemy info box fades in
+    this.tweens.add({
+      targets: this.eInfoContainer,
+      alpha: 1,
+      duration: 400,
+      delay: 600,
+    });
+
+    // Phase 2: After enemy slides in, show the intro text
+    this.time.delayedCall(900, () => {
+      const text = isWild
+        ? `Een wilde ${this.enemyMon.name} verschijnt!`
+        : `${this.trainerName} daagt je uit!`;
+
+      this.showMessage(text, () => {
+        if (!isWild) {
+          this.showMessage(`${this.trainerName} stuurt ${this.enemyMon.name} het veld in!`, () => {
+            this._slideInPlayer();
           });
-        });
-      } else {
-        this.showMessage(`Ga, ${this.playerMon.name}!`, () => {
-          this.state = STATES.PLAYER_TURN;
-          this.createActionMenu();
-        });
-      }
+        } else {
+          this._slideInPlayer();
+        }
+      });
+    });
+  }
+
+  _slideInPlayer() {
+    // Player + platform slide in from left
+    this.tweens.add({
+      targets: [this.playerSprite],
+      x: 220,
+      duration: 600,
+      ease: 'Power2',
+    });
+    this.tweens.add({
+      targets: [this.playerPlatform],
+      x: this.textures.exists('platform') ? 220 : 220,
+      duration: 600,
+      ease: 'Power2',
+    });
+    // Player info box fades in
+    this.tweens.add({
+      targets: this.pInfoContainer,
+      alpha: 1,
+      duration: 400,
+      delay: 300,
+    });
+
+    this.time.delayedCall(500, () => {
+      this.showMessage(`Ga, ${this.playerMon.name}!`, () => {
+        this.state = STATES.PLAYER_TURN;
+        this.createActionMenu();
+      });
     });
   }
 

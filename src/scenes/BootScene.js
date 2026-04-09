@@ -173,72 +173,395 @@ export class BootScene extends Phaser.Scene {
     g.fillStyle(0x000000, 0.2);
     g.fillEllipse(cx, cy + r * 0.8, r * 1.5, r * 0.4);
 
-    // Main body
-    g.fillStyle(color);
     switch (shape) {
       case 'diamond':
-        g.fillTriangle(cx, cy - r, cx + r, cy, cx, cy + r);
-        g.fillTriangle(cx, cy - r, cx - r, cy, cx, cy + r);
+        // Profitron — Invoice document with profit bar chart
+        // Document body
+        g.fillStyle(0xFFF9C4); // pale yellow paper
+        g.fillRoundedRect(cx - r * 0.75, cy - r * 0.9, r * 1.5, r * 1.8, r * 0.1);
+        // Document border
+        g.lineStyle(r * 0.04, 0xBDBDBD);
+        g.strokeRoundedRect(cx - r * 0.75, cy - r * 0.9, r * 1.5, r * 1.8, r * 0.1);
+        // Header line (red)
+        g.fillStyle(color);
+        g.fillRect(cx - r * 0.6, cy - r * 0.75, r * 1.2, r * 0.18);
+        // Bar chart — ascending profit bars
+        g.fillStyle(0x4CAF50);
+        g.fillRect(cx - r * 0.45, cy + r * 0.35, r * 0.22, -r * 0.3);
+        g.fillRect(cx - r * 0.15, cy + r * 0.35, r * 0.22, -r * 0.55);
+        g.fillStyle(accent); // gold
+        g.fillRect(cx + r * 0.15, cy + r * 0.35, r * 0.22, -r * 0.8);
+        // € sign accent
+        g.fillStyle(accent);
+        g.fillCircle(cx + r * 0.5, cy - r * 0.45, r * 0.18);
+        g.fillStyle(0xFFF9C4);
+        g.fillCircle(cx + r * 0.5, cy - r * 0.45, r * 0.11);
+        g.fillStyle(accent);
+        g.fillRect(cx + r * 0.38, cy - r * 0.48, r * 0.14, r * 0.04);
+        // Small arms
+        g.lineStyle(r * 0.06, color);
+        g.lineBetween(cx - r * 0.75, cy, cx - r * 0.95, cy - r * 0.2);
+        g.lineBetween(cx + r * 0.75, cy, cx + r * 0.95, cy - r * 0.2);
+        // Small feet
+        g.fillStyle(color);
+        g.fillRoundedRect(cx - r * 0.5, cy + r * 0.85, r * 0.3, r * 0.15, r * 0.05);
+        g.fillRoundedRect(cx + r * 0.2, cy + r * 0.85, r * 0.3, r * 0.15, r * 0.05);
+        // Eyes on document
+        g.fillStyle(0xFFFFFF);
+        g.fillCircle(cx - r * 0.25, cy - r * 0.15, r * 0.16);
+        g.fillCircle(cx + r * 0.15, cy - r * 0.15, r * 0.16);
+        g.fillStyle(0x000000);
+        g.fillCircle(cx - r * 0.2, cy - r * 0.12, r * 0.08);
+        g.fillCircle(cx + r * 0.2, cy - r * 0.12, r * 0.08);
         break;
+
       case 'circle':
-        g.fillCircle(cx, cy, r);
+        // Salarion — Euro coin creature
+        // Outer coin edge (ridged)
+        g.fillStyle(0xC9A930); // dark gold rim
+        g.fillCircle(cx, cy, r * 1.05);
+        // Ridge marks around edge
+        for (let i = 0; i < 24; i++) {
+          const angle = (Math.PI * 2 * i) / 24;
+          g.fillStyle(0xA67C00);
+          const rx = cx + Math.cos(angle) * r * 0.98;
+          const ry = cy + Math.sin(angle) * r * 0.98;
+          g.fillCircle(rx, ry, r * 0.04);
+        }
+        // Inner coin face
+        g.fillStyle(0xFFD700); // bright gold
+        g.fillCircle(cx, cy, r * 0.85);
+        // Inner ring detail
+        g.lineStyle(r * 0.03, 0xC9A930);
+        g.strokeCircle(cx, cy, r * 0.65);
+        // Large € symbol
+        g.fillStyle(color); // green
+        // € - main curve
+        g.lineStyle(r * 0.1, color);
+        g.beginPath();
+        g.arc(cx + r * 0.05, cy - r * 0.05, r * 0.35, -0.8, 0.8, false);
+        g.strokePath();
+        // € horizontal lines
+        g.fillStyle(color);
+        g.fillRect(cx - r * 0.35, cy - r * 0.15, r * 0.5, r * 0.06);
+        g.fillRect(cx - r * 0.35, cy + r * 0.05, r * 0.5, r * 0.06);
+        // Small feet
+        g.fillStyle(0xC9A930);
+        g.fillRoundedRect(cx - r * 0.4, cy + r * 0.85, r * 0.25, r * 0.15, r * 0.05);
+        g.fillRoundedRect(cx + r * 0.15, cy + r * 0.85, r * 0.25, r * 0.15, r * 0.05);
+        // Eyes
+        g.fillStyle(0xFFFFFF);
+        g.fillCircle(cx - r * 0.22, cy - r * 0.35, r * 0.14);
+        g.fillCircle(cx + r * 0.22, cy - r * 0.35, r * 0.14);
+        g.fillStyle(0x000000);
+        g.fillCircle(cx - r * 0.18, cy - r * 0.33, r * 0.07);
+        g.fillCircle(cx + r * 0.26, cy - r * 0.33, r * 0.07);
+        // Smile
+        g.lineStyle(r * 0.04, 0x000000);
+        g.beginPath();
+        g.arc(cx, cy + r * 0.45, r * 0.15, 0, Math.PI, false);
+        g.strokePath();
         break;
+
       case 'heart':
-        g.fillCircle(cx - r * 0.35, cy - r * 0.2, r * 0.5);
-        g.fillCircle(cx + r * 0.35, cy - r * 0.2, r * 0.5);
-        g.fillTriangle(cx - r * 0.8, cy, cx + r * 0.8, cy, cx, cy + r * 0.8);
+        // Relatiox — Heart with handshake / trust motif
+        // Main heart body
+        g.fillStyle(color);
+        g.fillCircle(cx - r * 0.4, cy - r * 0.25, r * 0.55);
+        g.fillCircle(cx + r * 0.4, cy - r * 0.25, r * 0.55);
+        g.fillTriangle(cx - r * 0.9, cy, cx + r * 0.9, cy, cx, cy + r * 0.9);
+        // Highlight
+        g.fillStyle(0x64B5F6, 0.4);
+        g.fillCircle(cx - r * 0.45, cy - r * 0.35, r * 0.2);
+        // Handshake in center
+        g.fillStyle(0xFFDDB0); // skin tone
+        // Left hand
+        g.fillRoundedRect(cx - r * 0.5, cy - r * 0.1, r * 0.45, r * 0.2, r * 0.06);
+        // Right hand
+        g.fillRoundedRect(cx + r * 0.05, cy - r * 0.1, r * 0.45, r * 0.2, r * 0.06);
+        // Clasp overlap
+        g.fillStyle(0xFFCC80);
+        g.fillRoundedRect(cx - r * 0.15, cy - r * 0.12, r * 0.3, r * 0.24, r * 0.06);
+        // Network dots (connection nodes)
+        g.fillStyle(accent);
+        g.fillCircle(cx - r * 0.65, cy - r * 0.6, r * 0.08);
+        g.fillCircle(cx + r * 0.65, cy - r * 0.6, r * 0.08);
+        g.fillCircle(cx, cy + r * 0.55, r * 0.08);
+        // Connection lines
+        g.lineStyle(r * 0.03, accent, 0.5);
+        g.lineBetween(cx - r * 0.65, cy - r * 0.6, cx, cy - r * 0.1);
+        g.lineBetween(cx + r * 0.65, cy - r * 0.6, cx, cy - r * 0.1);
+        g.lineBetween(cx, cy + r * 0.55, cx, cy + r * 0.1);
+        // Eyes on top lobes
+        g.fillStyle(0xFFFFFF);
+        g.fillCircle(cx - r * 0.35, cy - r * 0.35, r * 0.15);
+        g.fillCircle(cx + r * 0.35, cy - r * 0.35, r * 0.15);
+        g.fillStyle(0x000000);
+        g.fillCircle(cx - r * 0.3, cy - r * 0.33, r * 0.08);
+        g.fillCircle(cx + r * 0.4, cy - r * 0.33, r * 0.08);
         break;
+
       case 'square':
-        g.fillRoundedRect(cx - r, cy - r, r * 2, r * 2, r * 0.2);
+        // Orderon — Delivery box / package creature
+        // Main box body
+        g.fillStyle(0xBF8040); // cardboard brown
+        g.fillRoundedRect(cx - r * 0.85, cy - r * 0.7, r * 1.7, r * 1.5, r * 0.08);
+        // Box flap (top)
+        g.fillStyle(0xA0652A);
+        g.fillTriangle(cx - r * 0.85, cy - r * 0.7, cx, cy - r * 0.95, cx + r * 0.85, cy - r * 0.7);
+        // Tape stripe down center
+        g.fillStyle(0xC9A930, 0.7);
+        g.fillRect(cx - r * 0.08, cy - r * 0.95, r * 0.16, r * 0.5);
+        g.fillRect(cx - r * 0.08, cy - r * 0.7, r * 0.16, r * 1.5);
+        // Shipping arrows (up arrows)
+        g.fillStyle(color); // red
+        g.fillTriangle(cx + r * 0.35, cy + r * 0.05, cx + r * 0.55, cy + r * 0.25, cx + r * 0.15, cy + r * 0.25);
+        g.fillRect(cx + r * 0.28, cy + r * 0.25, r * 0.14, r * 0.2);
+        // Checklist
+        g.fillStyle(0xFFFFFF);
+        g.fillRect(cx - r * 0.6, cy - r * 0.15, r * 0.5, r * 0.55);
+        g.fillStyle(0x4CAF50);
+        g.fillRect(cx - r * 0.55, cy - r * 0.08, r * 0.1, r * 0.08);
+        g.fillRect(cx - r * 0.55, cy + r * 0.08, r * 0.1, r * 0.08);
+        g.fillRect(cx - r * 0.55, cy + r * 0.24, r * 0.1, r * 0.08);
+        g.lineStyle(r * 0.03, 0x666666);
+        g.lineBetween(cx - r * 0.4, cy - r * 0.04, cx - r * 0.15, cy - r * 0.04);
+        g.lineBetween(cx - r * 0.4, cy + r * 0.12, cx - r * 0.15, cy + r * 0.12);
+        g.lineBetween(cx - r * 0.4, cy + r * 0.28, cx - r * 0.15, cy + r * 0.28);
+        // Small feet
+        g.fillStyle(0x8D6E63);
+        g.fillRoundedRect(cx - r * 0.55, cy + r * 0.75, r * 0.3, r * 0.15, r * 0.05);
+        g.fillRoundedRect(cx + r * 0.25, cy + r * 0.75, r * 0.3, r * 0.15, r * 0.05);
+        // Eyes
+        g.fillStyle(0xFFFFFF);
+        g.fillCircle(cx - r * 0.25, cy - r * 0.4, r * 0.16);
+        g.fillCircle(cx + r * 0.25, cy - r * 0.4, r * 0.16);
+        g.fillStyle(0x000000);
+        g.fillCircle(cx - r * 0.2, cy - r * 0.38, r * 0.08);
+        g.fillCircle(cx + r * 0.3, cy - r * 0.38, r * 0.08);
         break;
+
       case 'gear':
-        g.fillCircle(cx, cy, r);
-        for (let i = 0; i < 6; i++) {
-          const angle = (Math.PI * 2 * i) / 6;
+        // Workflox — Interlocking gears with lightning bolt
+        // Main gear
+        g.fillStyle(color);
+        g.fillCircle(cx - r * 0.15, cy, r * 0.7);
+        for (let i = 0; i < 8; i++) {
+          const angle = (Math.PI * 2 * i) / 8;
           g.fillRect(
-            cx + Math.cos(angle) * r * 0.7 - r * 0.15,
-            cy + Math.sin(angle) * r * 0.7 - r * 0.15,
-            r * 0.3, r * 0.3
+            cx - r * 0.15 + Math.cos(angle) * r * 0.55 - r * 0.12,
+            cy + Math.sin(angle) * r * 0.55 - r * 0.12,
+            r * 0.24, r * 0.24
           );
         }
-        break;
-      case 'triangle':
-        g.fillTriangle(cx, cy - r, cx - r, cy + r * 0.7, cx + r, cy + r * 0.7);
-        break;
-      case 'phone':
-        g.fillRoundedRect(cx - r * 0.5, cy - r * 0.8, r, r * 1.6, r * 0.15);
+        // Gear hole
+        g.fillStyle(0x7B1FA2, 0.5);
+        g.fillCircle(cx - r * 0.15, cy, r * 0.25);
+        // Second smaller gear (interlocking)
         g.fillStyle(accent);
-        g.fillRect(cx - r * 0.35, cy - r * 0.55, r * 0.7, r * 0.9);
-        g.fillStyle(color);
-        break;
-      case 'star':
-        for (let i = 0; i < 5; i++) {
-          const angle = (Math.PI * 2 * i) / 5 - Math.PI / 2;
-          const nextAngle = (Math.PI * 2 * (i + 0.5)) / 5 - Math.PI / 2;
-          const outerX = cx + Math.cos(angle) * r;
-          const outerY = cy + Math.sin(angle) * r;
-          const innerX = cx + Math.cos(nextAngle) * r * 0.45;
-          const innerY = cy + Math.sin(nextAngle) * r * 0.45;
-          g.fillTriangle(cx, cy, outerX, outerY, innerX, innerY);
-          const prevAngle = (Math.PI * 2 * (i - 0.5)) / 5 - Math.PI / 2;
-          const prevInnerX = cx + Math.cos(prevAngle) * r * 0.45;
-          const prevInnerY = cy + Math.sin(prevAngle) * r * 0.45;
-          g.fillTriangle(cx, cy, outerX, outerY, prevInnerX, prevInnerY);
+        g.fillCircle(cx + r * 0.55, cy - r * 0.35, r * 0.35);
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI * 2 * i) / 6 + 0.26;
+          g.fillRect(
+            cx + r * 0.55 + Math.cos(angle) * r * 0.28 - r * 0.07,
+            cy - r * 0.35 + Math.sin(angle) * r * 0.28 - r * 0.07,
+            r * 0.14, r * 0.14
+          );
         }
+        g.fillStyle(0x006064, 0.5);
+        g.fillCircle(cx + r * 0.55, cy - r * 0.35, r * 0.12);
+        // Lightning bolt (chaos energy)
+        g.fillStyle(0xFFEB3B);
+        g.fillTriangle(
+          cx - r * 0.05, cy - r * 0.6,
+          cx + r * 0.2, cy - r * 0.1,
+          cx - r * 0.05, cy - r * 0.1
+        );
+        g.fillTriangle(
+          cx + r * 0.05, cy + r * 0.6,
+          cx - r * 0.2, cy + r * 0.1,
+          cx + r * 0.05, cy + r * 0.1
+        );
+        // Motion lines
+        g.lineStyle(r * 0.03, accent, 0.5);
+        g.lineBetween(cx - r * 0.9, cy - r * 0.2, cx - r * 1.0, cy - r * 0.3);
+        g.lineBetween(cx - r * 0.9, cy + r * 0.1, cx - r * 1.0, cy + r * 0.1);
+        g.lineBetween(cx - r * 0.85, cy + r * 0.4, cx - r * 0.95, cy + r * 0.5);
+        // Wild eyes
+        g.fillStyle(0xFFEB3B);
+        g.fillCircle(cx - r * 0.35, cy - r * 0.1, r * 0.18);
+        g.fillCircle(cx + r * 0.05, cy - r * 0.1, r * 0.18);
+        g.fillStyle(0x000000);
+        // Swirl pupils for "crazy" look
+        g.fillCircle(cx - r * 0.3, cy - r * 0.08, r * 0.07);
+        g.fillCircle(cx + r * 0.1, cy - r * 0.08, r * 0.07);
+        g.lineStyle(r * 0.03, 0x000000);
+        g.beginPath();
+        g.arc(cx - r * 0.3, cy - r * 0.08, r * 0.12, 0, Math.PI * 1.5, false);
+        g.strokePath();
+        // Jagged mouth
+        g.lineStyle(r * 0.04, 0x000000);
+        g.lineBetween(cx - r * 0.3, cy + r * 0.15, cx - r * 0.15, cy + r * 0.25);
+        g.lineBetween(cx - r * 0.15, cy + r * 0.25, cx, cy + r * 0.15);
+        g.lineBetween(cx, cy + r * 0.15, cx + r * 0.1, cy + r * 0.25);
+        break;
+
+      case 'triangle':
+        // Projecto — Clipboard / kanban board creature
+        // Clipboard body
+        g.fillStyle(0x1565C0); // dark blue
+        g.fillRoundedRect(cx - r * 0.75, cy - r * 0.85, r * 1.5, r * 1.85, r * 0.08);
+        // Clip at top
+        g.fillStyle(0x90A4AE);
+        g.fillRoundedRect(cx - r * 0.25, cy - r * 1.0, r * 0.5, r * 0.25, r * 0.06);
+        // Board face (white area)
+        g.fillStyle(0xFFFFFF);
+        g.fillRoundedRect(cx - r * 0.6, cy - r * 0.6, r * 1.2, r * 1.4, r * 0.05);
+        // Progress bars (kanban style)
+        // Bar 1 — complete (green)
+        g.fillStyle(0x4CAF50);
+        g.fillRoundedRect(cx - r * 0.45, cy - r * 0.05, r * 0.9, r * 0.12, r * 0.03);
+        // Bar 2 — in progress (orange)
+        g.fillStyle(accent);
+        g.fillRoundedRect(cx - r * 0.45, cy + r * 0.15, r * 0.6, r * 0.12, r * 0.03);
+        // Bar 3 — not started (gray)
+        g.fillStyle(0xBDBDBD);
+        g.fillRoundedRect(cx - r * 0.45, cy + r * 0.35, r * 0.3, r * 0.12, r * 0.03);
+        // Checkmarks
+        g.lineStyle(r * 0.05, 0x4CAF50);
+        g.lineBetween(cx - r * 0.5, cy - r * 0.35, cx - r * 0.4, cy - r * 0.25);
+        g.lineBetween(cx - r * 0.4, cy - r * 0.25, cx - r * 0.25, cy - r * 0.45);
+        g.lineStyle(r * 0.05, accent);
+        g.lineBetween(cx + r * 0.25, cy - r * 0.35, cx + r * 0.35, cy - r * 0.25);
+        g.lineBetween(cx + r * 0.35, cy - r * 0.25, cx + r * 0.5, cy - r * 0.45);
+        // Small legs
+        g.fillStyle(0x1565C0);
+        g.fillRoundedRect(cx - r * 0.45, cy + r * 0.85, r * 0.25, r * 0.15, r * 0.05);
+        g.fillRoundedRect(cx + r * 0.2, cy + r * 0.85, r * 0.25, r * 0.15, r * 0.05);
+        // Eyes
+        g.fillStyle(0xFFFFFF);
+        g.fillCircle(cx - r * 0.2, cy + r * 0.6, r * 0.14);
+        g.fillCircle(cx + r * 0.2, cy + r * 0.6, r * 0.14);
+        g.fillStyle(0x1565C0);
+        g.fillCircle(cx - r * 0.16, cy + r * 0.62, r * 0.07);
+        g.fillCircle(cx + r * 0.24, cy + r * 0.62, r * 0.07);
+        break;
+
+      case 'phone':
+        // Pocketon — Smartphone creature with apps and notification
+        // Phone body
+        g.fillStyle(0x212121);
+        g.fillRoundedRect(cx - r * 0.55, cy - r * 0.9, r * 1.1, r * 1.8, r * 0.12);
+        // Screen
+        g.fillStyle(color);
+        g.fillRoundedRect(cx - r * 0.45, cy - r * 0.7, r * 0.9, r * 1.35, r * 0.05);
+        // Notch
+        g.fillStyle(0x212121);
+        g.fillRoundedRect(cx - r * 0.2, cy - r * 0.72, r * 0.4, r * 0.1, r * 0.04);
+        // App grid (3x3)
+        const appColors = [0x4CAF50, 0x2196F3, 0xE53935, 0xFFD700, 0xE91E63, 0xFF9800, 0x00BCD4, 0x9C27B0, 0x8BC34A];
+        for (let row = 0; row < 3; row++) {
+          for (let col = 0; col < 3; col++) {
+            g.fillStyle(appColors[row * 3 + col]);
+            g.fillRoundedRect(
+              cx - r * 0.38 + col * r * 0.28,
+              cy - r * 0.45 + row * r * 0.35,
+              r * 0.2, r * 0.2,
+              r * 0.04
+            );
+          }
+        }
+        // Notification bubble
+        g.fillStyle(0xE53935);
+        g.fillCircle(cx + r * 0.55, cy - r * 0.75, r * 0.18);
+        g.fillStyle(0xFFFFFF);
+        g.fillCircle(cx + r * 0.55, cy - r * 0.75, r * 0.06);
+        // Signal lines
+        g.lineStyle(r * 0.03, accent, 0.7);
+        g.beginPath();
+        g.arc(cx + r * 0.55, cy - r * 0.75, r * 0.28, -1.2, -0.3, false);
+        g.strokePath();
+        g.beginPath();
+        g.arc(cx + r * 0.55, cy - r * 0.75, r * 0.38, -1.2, -0.3, false);
+        g.strokePath();
+        // Eyes on screen
+        g.fillStyle(0xFFFFFF);
+        g.fillCircle(cx - r * 0.18, cy - r * 0.55, r * 0.1);
+        g.fillCircle(cx + r * 0.18, cy - r * 0.55, r * 0.1);
+        g.fillStyle(0x000000);
+        g.fillCircle(cx - r * 0.14, cy - r * 0.53, r * 0.05);
+        g.fillCircle(cx + r * 0.22, cy - r * 0.53, r * 0.05);
+        // Home button / bar
+        g.fillStyle(0x616161);
+        g.fillRoundedRect(cx - r * 0.2, cy + r * 0.72, r * 0.4, r * 0.05, r * 0.02);
+        break;
+
+      case 'star':
+        // Innovaxx — Brain/circuit hybrid with crown
+        // Glowing aura
+        g.fillStyle(accent, 0.15);
+        g.fillCircle(cx, cy, r * 1.15);
+        g.fillStyle(color, 0.2);
+        g.fillCircle(cx, cy, r * 1.0);
+        // Brain body
+        g.fillStyle(color);
+        // Left hemisphere
+        g.fillCircle(cx - r * 0.3, cy - r * 0.1, r * 0.55);
+        // Right hemisphere
+        g.fillCircle(cx + r * 0.3, cy - r * 0.1, r * 0.55);
+        // Bottom connection
+        g.fillCircle(cx, cy + r * 0.25, r * 0.4);
+        // Brain folds
+        g.lineStyle(r * 0.04, 0xDAA520);
+        g.beginPath();
+        g.arc(cx - r * 0.25, cy - r * 0.2, r * 0.25, -0.5, 1.5, false);
+        g.strokePath();
+        g.beginPath();
+        g.arc(cx + r * 0.25, cy - r * 0.2, r * 0.25, 1.6, 3.6, false);
+        g.strokePath();
+        // Circuit lines
+        g.lineStyle(r * 0.03, accent, 0.8);
+        g.lineBetween(cx - r * 0.6, cy, cx - r * 0.85, cy);
+        g.lineBetween(cx + r * 0.6, cy, cx + r * 0.85, cy);
+        g.lineBetween(cx, cy + r * 0.55, cx, cy + r * 0.75);
+        g.lineBetween(cx - r * 0.45, cy - r * 0.5, cx - r * 0.65, cy - r * 0.7);
+        g.lineBetween(cx + r * 0.45, cy - r * 0.5, cx + r * 0.65, cy - r * 0.7);
+        // Circuit nodes
+        g.fillStyle(accent);
+        g.fillCircle(cx - r * 0.85, cy, r * 0.06);
+        g.fillCircle(cx + r * 0.85, cy, r * 0.06);
+        g.fillCircle(cx, cy + r * 0.75, r * 0.06);
+        g.fillCircle(cx - r * 0.65, cy - r * 0.7, r * 0.06);
+        g.fillCircle(cx + r * 0.65, cy - r * 0.7, r * 0.06);
+        // Crown / halo (legendary)
+        g.fillStyle(color);
+        g.fillTriangle(cx - r * 0.4, cy - r * 0.55, cx - r * 0.25, cy - r * 0.85, cx - r * 0.1, cy - r * 0.55);
+        g.fillTriangle(cx - r * 0.15, cy - r * 0.55, cx, cy - r * 0.95, cx + r * 0.15, cy - r * 0.55);
+        g.fillTriangle(cx + r * 0.1, cy - r * 0.55, cx + r * 0.25, cy - r * 0.85, cx + r * 0.4, cy - r * 0.55);
+        // Crown gems
+        g.fillStyle(accent);
+        g.fillCircle(cx, cy - r * 0.8, r * 0.06);
+        g.fillCircle(cx - r * 0.25, cy - r * 0.7, r * 0.05);
+        g.fillCircle(cx + r * 0.25, cy - r * 0.7, r * 0.05);
+        // Sparkle effects
+        g.fillStyle(0xFFFFFF, 0.8);
+        g.fillCircle(cx + r * 0.7, cy - r * 0.55, r * 0.05);
+        g.fillCircle(cx - r * 0.75, cy - r * 0.45, r * 0.04);
+        g.fillCircle(cx + r * 0.5, cy + r * 0.5, r * 0.04);
+        // Eyes
+        g.fillStyle(0xFFFFFF);
+        g.fillCircle(cx - r * 0.25, cy - r * 0.1, r * 0.17);
+        g.fillCircle(cx + r * 0.25, cy - r * 0.1, r * 0.17);
+        g.fillStyle(accent);
+        g.fillCircle(cx - r * 0.2, cy - r * 0.08, r * 0.09);
+        g.fillCircle(cx + r * 0.3, cy - r * 0.08, r * 0.09);
+        // Wise smile
+        g.lineStyle(r * 0.04, 0xFFFFFF, 0.8);
+        g.beginPath();
+        g.arc(cx, cy + r * 0.2, r * 0.15, 0.2, Math.PI - 0.2, false);
+        g.strokePath();
         break;
     }
-
-    // Eyes
-    g.fillStyle(0xFFFFFF);
-    g.fillCircle(cx - r * 0.25, cy - r * 0.15, r * 0.18);
-    g.fillCircle(cx + r * 0.25, cy - r * 0.15, r * 0.18);
-    g.fillStyle(0x000000);
-    g.fillCircle(cx - r * 0.2, cy - r * 0.12, r * 0.09);
-    g.fillCircle(cx + r * 0.3, cy - r * 0.12, r * 0.09);
-
-    // Accent detail
-    g.fillStyle(accent);
-    g.fillCircle(cx, cy + r * 0.3, r * 0.15);
   }
 
   generateNPCSprites() {

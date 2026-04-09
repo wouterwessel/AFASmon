@@ -1301,7 +1301,10 @@ export class WorldScene extends Phaser.Scene {
     if (this.quizContainer) { this.quizContainer.destroy(); this.quizContainer = null; }
     // Team menu
     if (this.teamMenu) { this.teamMenu.destroy(); this.teamMenu = null; }
-    // Dialog system
-    if (this.dialogSystem) this.dialogSystem.hide();
+    // Dialog system – clear callback first to prevent it firing during shutdown
+    if (this.dialogSystem) {
+      this.dialogSystem.currentCallback = null;
+      this.dialogSystem.hide();
+    }
   }
 }
